@@ -1,0 +1,2278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>七七软件商城</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #f2f2f7;
+            color: #000;
+            padding-bottom: 85px;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        input, textarea { -webkit-user-select: text; user-select: text; }
+
+        .verified-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+            cursor: default;
+            margin-left: 4px;
+            background: #8E8E93;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+        .badge-gold { background: linear-gradient(135deg, #FFD700, #FF9900); }
+        .badge-blue { background: linear-gradient(135deg, #00D8FF, #007AFF); }
+        .badge-gray { background: linear-gradient(135deg, #9a9aa0, #727278); }
+
+        .page { display: none; }
+        .page.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+        .header {
+            position: sticky;
+            top: 0;
+            background: rgba(242,242,247,0.82);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            z-index: 90;
+            border-bottom: 0.5px solid rgba(0,0,0,0.08);
+        }
+        .header-content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header-content .app-title {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+            margin: 0;
+            flex: 1;
+        }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            color: #007AFF;
+            font-size: 17px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .back-btn::before { content: '‹'; font-size: 28px; margin-right: 4px; }
+
+        .sticky-title {
+            font-size: 18px;
+            font-weight: 600;
+            flex: 1;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: none;
+        }
+        .sticky-visit-btn { flex-shrink: 0; display: none; }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: #e4e4ea;
+            border-radius: 10px;
+            padding: 7px 12px;
+            flex: 1;
+        }
+        .search-bar:focus-within { background: #fff; box-shadow: 0 0 0 4px rgba(0,122,255,0.18); }
+        .search-icon { color: #8e8e93; margin-right: 8px; font-size: 14px; }
+        .search-input { flex:1; border:none; background:transparent; font-size:16px; outline:none; }
+
+        .container { max-width: 900px; margin: 0 auto; padding: 16px 20px; }
+        .section-title { font-size: 20px; font-weight: 700; margin: 24px 0 12px; }
+        .section-title:first-child { margin-top: 8px; }
+
+        .category-tabs {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            margin-bottom: 16px;
+        }
+        .category-tab {
+            padding: 7px 16px;
+            background: #e5e5ea;
+            border-radius: 18px;
+            font-size: 14px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .category-tab.active { background: #007AFF; color: #fff; }
+
+        .featured-card {
+            background: linear-gradient(135deg, #007AFF, #5856D6);
+            border-radius: 16px;
+            height: 200px;
+            padding: 24px;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        .featured-card::before {
+            content: "";
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 160px;
+            height: 160px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 50%;
+        }
+        .featured-title { font-size: 24px; font-weight: 700; margin: 6px 0; z-index: 2; position: relative; }
+        .featured-desc { font-size: 14px; opacity: 0.9; z-index: 2; position: relative; }
+        .featured-tag { z-index: 2; position: relative; font-size: 13px; opacity: 0.85; }
+
+        .app-list {
+            background: #fff;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+        .app-list-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            border-bottom: 0.5px solid #eee;
+            cursor: pointer;
+            transition: background 0.2s;
+            min-height: 80px;
+        }
+        .app-list-item:last-child { border-bottom: none; }
+        .app-list-item:hover { background: #f8f8fa; }
+
+        .rank-number {
+            width: 28px;
+            height: 28px;
+            line-height: 28px;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 700;
+            color: #999;
+            flex-shrink: 0;
+            border-radius: 50%;
+            background: transparent;
+        }
+        .top-1 { color: #fff; background: #FF9500; }
+        .top-2 { color: #fff; background: #A8A8A8; }
+        .top-3 { color: #fff; background: #CD7F32; }
+
+        .app-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            flex-shrink: 0;
+            overflow: hidden;
+            background: #e5e5ea;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .app-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        .app-info {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .app-name-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 2px;
+        }
+        .app-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #000;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .app-rating-downloads {
+            font-size: 12px;
+            color: #888;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .app-author-row {
+            font-size: 13px;
+            font-weight: 500;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 2px;
+        }
+        .app-author-name { cursor: pointer; }
+        .app-author-name:hover { color: #007AFF; }
+        .app-desc {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .visit-btn {
+            padding: 6px 16px;
+            border-radius: 18px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            min-width: 60px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .visit-btn.online { background: #e5e5ea; color: #007AFF; }
+        .visit-btn.beta { background: rgba(255,149,0,0.15); color: #FF9500; }
+        .visit-btn.offline, .visit-btn.error { color: #888; cursor: not-allowed; }
+
+        .detail-header {
+            display: flex;
+            align-items: center;
+            padding: 16px 0;
+            gap: 16px;
+        }
+        .detail-header .app-icon { width: 90px; height: 90px; border-radius: 20px; }
+        .detail-header .app-name { font-size: 24px; font-weight: 700; color: #000; margin-bottom: 6px; }
+        .detail-author-row {
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+        .detail-author-row:hover { color: #007AFF; }
+
+        .detail-stats {
+            display: flex;
+            justify-content: space-around;
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .stat-item { text-align: center; padding: 4px 8px; }
+        .stat-value { font-size: 18px; font-weight: 700; color: #007AFF; margin-bottom: 4px; }
+        .stat-label { font-size: 12px; color: #888; }
+
+        .screenshots {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+        .screenshot {
+            width: 150px;
+            height: 270px;
+            border-radius: 10px;
+            flex-shrink: 0;
+            overflow: hidden;
+            background: #eee;
+            cursor: pointer;
+            transition: transform 0.15s;
+            position: relative;
+        }
+        .screenshot:hover {
+            transform: scale(1.02);
+        }
+        .screenshot img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .detail-section-title { font-size: 18px; font-weight: 700; margin: 20px 0 10px; }
+        .detail-description { font-size: 14px; line-height: 1.6; white-space: pre-line; color: #333; }
+
+        .update-log {
+            background: #fff;
+            border-radius: 14px;
+            padding: 4px 16px;
+        }
+        .update-item { padding: 12px 0; border-bottom: 0.5px solid #eee; }
+        .update-item:last-child { border-bottom: none; }
+        .update-version { display: flex; justify-content: space-between; font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+        .update-date { font-size: 12px; color: #888; font-weight: 400; }
+        .update-content { font-size: 13px; line-height: 1.6; white-space: pre-line; color: #333; }
+
+        .developer-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .developer-card:hover { background: #f8f8fa; }
+        .dev-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            overflow: hidden;
+            background: #e5e5ea;
+        }
+        .dev-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .dev-name-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+        .dev-name { font-size: 16px; font-weight: 600; }
+        .dev-desc { font-size: 13px; color: #888; }
+        .dev-arrow { color: #ccc; font-size: 20px; margin-left: auto; }
+
+        .collaborator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 8px;
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+        }
+        .collaborator-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+            padding: 8px 12px;
+            border-radius: 10px;
+            background: #f8f8fa;
+        }
+        .collaborator-item:hover { background: #e8e8ee; }
+        .collaborator-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: #e5e5ea;
+        }
+        .collaborator-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .collaborator-info {
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .collaborator-role {
+            font-size: 11px;
+            color: #888;
+            display: block;
+            margin-top: 1px;
+        }
+
+        .info-list {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border-bottom: 0.5px solid #eee;
+            font-size: 14px;
+        }
+        .info-item:last-child { border-bottom: none; }
+        .info-label { color: #888; }
+        .info-value { font-weight: 500; }
+
+        .developer-header { text-align: center; padding: 20px 0; }
+        .developer-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 12px;
+            overflow: hidden;
+            background: #e5e5ea;
+        }
+        .developer-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .developer-name-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 6px;
+        }
+        .developer-name { font-size: 24px; font-weight: 700; }
+        .dev-rating-downloads {
+            font-size: 14px;
+            color: #888;
+            font-weight: 400;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: 6px;
+        }
+        .developer-desc { font-size: 14px; color: #888; }
+        .developer-stats {
+            display: flex;
+            justify-content: center;
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .community-tabs {
+            display: flex;
+            background: #fff;
+            border-radius: 14px;
+            padding: 4px;
+            margin-bottom: 16px;
+        }
+        .community-tab {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            font-size: 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            color: #888;
+        }
+        .community-tab.active { background: #007AFF; color: #fff; font-weight: 600; }
+        .post-list { display: flex; flex-direction: column; gap: 12px; }
+        .post-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px;
+        }
+        .post-card.official { border: 1px solid rgba(255,59,48,0.25); background: #fff9f9; }
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .post-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: #e5e5ea;
+        }
+        .post-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .post-user-row { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; }
+        .post-username { font-size: 15px; font-weight: 600; }
+        .username-official { color: #FF3B30 !important; }
+        .post-time { font-size: 12px; color: #888; }
+        .post-content { font-size: 14px; line-height: 1.6; margin-bottom: 12px; white-space: pre-line; }
+        .post-actions {
+            display: flex;
+            justify-content: space-around;
+            padding-top: 10px;
+            border-top: 0.5px solid #eee;
+        }
+        .post-action {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+            color: #888;
+            cursor: pointer;
+        }
+        .post-action:hover { color: #007AFF; }
+
+        .creator-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .creator-item {
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .creator-item:hover { background: #f8f8fa; }
+        .creator-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            overflow: hidden;
+            background: #e5e5ea;
+        }
+        .creator-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .creator-info { flex: 1; }
+        .creator-name-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+        .creator-name { font-size: 16px; font-weight: 600; }
+        .creator-desc { font-size: 13px; color: #888; }
+        .creator-arrow { color: #ccc; font-size: 20px; }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(249,249,249,0.94);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 0.5px solid rgba(0,0,0,0.1);
+            z-index: 999;
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-bottom: constant(safe-area-inset-bottom);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        .bottom-nav.hidden { transform: translateY(100%); opacity: 0; pointer-events: none; }
+        .bottom-nav-content {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            padding: 6px 0 12px;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #8E8E93;
+            font-size: 10px;
+            cursor: pointer;
+            padding: 4px 12px;
+        }
+        .nav-item.active { color: #007AFF; }
+        .nav-icon { font-size: 20px; margin-bottom: 3px; }
+
+        /* 更新日志模态框 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-card {
+            background: #fff;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            padding: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow-y: auto;
+            position: relative;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .modal-header h3 { font-size: 20px; font-weight: 700; }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #888;
+            cursor: pointer;
+            padding: 0 8px;
+        }
+        .modal-close:hover { color: #000; }
+        .modal-update-item { padding: 12px 0; border-bottom: 0.5px solid #eee; }
+        .modal-update-item:last-child { border-bottom: none; }
+        .modal-update-version { display: flex; justify-content: space-between; font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+        .modal-update-date { font-size: 12px; color: #888; font-weight: 400; }
+        .modal-update-content { font-size: 13px; line-height: 1.6; white-space: pre-line; color: #333; }
+
+        /* ===== 自定义提示弹窗 ===== */
+        .alert-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            animation: fadeIn 0.25s ease;
+        }
+        .alert-overlay.active {
+            display: flex;
+        }
+        .alert-card {
+            background: #fff;
+            border-radius: 20px;
+            max-width: 340px;
+            width: 100%;
+            padding: 28px 24px 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes scaleIn {
+            from { transform: scale(0.92); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .alert-icon {
+            font-size: 44px;
+            margin-bottom: 12px;
+            display: block;
+        }
+        .alert-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 6px;
+        }
+        .alert-message {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        .alert-btn {
+            background: #007AFF;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 10px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            min-width: 100px;
+        }
+        .alert-btn:hover {
+            background: #0055CC;
+        }
+        .alert-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* ===== 图片预览卡片弹窗 ===== */
+        .image-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            animation: fadeIn 0.25s ease;
+        }
+        .image-overlay.active {
+            display: flex;
+        }
+        .image-card {
+            background: #fff;
+            border-radius: 20px;
+            max-width: 90vw;
+            max-height: 90vh;
+            width: auto;
+            padding: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+        }
+        .image-card img {
+            max-width: 100%;
+            max-height: calc(90vh - 80px);
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border-radius: 12px;
+            display: block;
+        }
+        .image-close {
+            align-self: flex-end;
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #888;
+            cursor: pointer;
+            padding: 4px 8px;
+            margin-bottom: 8px;
+            transition: color 0.2s;
+            line-height: 1;
+        }
+        .image-close:hover {
+            color: #000;
+        }
+        @media(max-width:600px) {
+            .image-card {
+                padding: 12px;
+                max-width: 95vw;
+            }
+            .image-close {
+                font-size: 24px;
+            }
+            .image-card img {
+                max-height: calc(90vh - 60px);
+            }
+        }
+
+        @media(max-width:600px) {
+            .app-title { font-size: 24px; }
+            .featured-card { height: 170px; padding: 18px; }
+            .featured-title { font-size: 20px; }
+            .app-icon { width: 48px; height: 48px; }
+            .app-name { font-size: 14px; }
+            .app-rating-downloads { font-size: 11px; }
+            .detail-header .app-icon { width: 70px; height: 70px; }
+            .detail-header .app-name { font-size: 20px; }
+            .screenshot { width: 130px; height: 230px; }
+            .header-content { flex-wrap: wrap; }
+            .header-content .app-title { font-size: 22px; }
+            .sticky-title { font-size: 16px; }
+            .dev-rating-downloads { font-size: 12px; margin-left: 4px; }
+            .developer-name { font-size: 20px; }
+            .modal-card { max-height: 90vh; padding: 16px; }
+            .creator-avatar { width: 44px; height: 44px; }
+            .creator-name { font-size: 14px; }
+            .creator-desc { font-size: 12px; }
+            .collaborator-grid { grid-template-columns: 1fr; gap: 8px; padding: 12px; }
+            .collaborator-avatar { width: 32px; height: 32px; }
+            .collaborator-info { font-size: 12px; }
+            .alert-card { max-width: 300px; padding: 24px 20px 16px; }
+            .alert-icon { font-size: 36px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 首页 -->
+    <div class="page active" id="page-home">
+        <div class="header">
+            <div class="header-content">
+                <h1 class="app-title">七七软件商城</h1>
+                <div class="search-bar">
+                    <span class="search-icon">🔍</span>
+                    <input class="search-input" placeholder="搜索应用、游戏和更多">
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <h2 class="section-title">今日精选</h2>
+            <div class="featured-card" onclick="goToAppDetail('video')">
+                <div class="featured-tag">精选推荐</div>
+                <h3 class="featured-title">七七视频解析</h3>
+                <p class="featured-desc">全网视频免费看，支持各大平台解析</p>
+            </div>
+            <h2 class="section-title">热门排行</h2>
+            <div class="app-list" id="home-app-list"></div>
+        </div>
+    </div>
+
+    <!-- 应用列表页 -->
+    <div class="page" id="page-apps">
+        <div class="header">
+            <div class="header-content">
+                <h1 class="app-title">应用</h1>
+                <div class="search-bar">
+                    <span class="search-icon">🔍</span>
+                    <input class="search-input" placeholder="搜索应用">
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="category-tabs">
+                <div class="category-tab active" onclick="filterCategory('all',this)">全部</div>
+                <div class="category-tab" onclick="filterCategory('tools',this)">工具</div>
+                <div class="category-tab" onclick="filterCategory('reading',this)">阅读</div>
+                <div class="category-tab" onclick="filterCategory('education',this)">教育</div>
+                <div class="category-tab" onclick="filterCategory('game',this)">游戏</div>
+                <div class="category-tab" onclick="filterCategory('me',this)">个人</div>
+                <div class="category-tab" onclick="filterCategory('online',this)">已上线</div>
+            </div>
+            <div class="app-list" id="all-apps-list"></div>
+        </div>
+    </div>
+
+    <!-- 应用详情页 -->
+    <div class="page" id="page-app-detail">
+        <div class="header">
+            <div class="header-content">
+                <div class="back-btn" onclick="goBack()">返回</div>
+                <span class="sticky-title" id="sticky-title">应用名称</span>
+                <button class="visit-btn online sticky-visit-btn" id="sticky-visit-btn">访问</button>
+            </div>
+        </div>
+        <div class="container">
+            <div class="detail-header" id="detail-header">
+                <div class="app-icon" id="detail-icon"><img src="" alt="应用图标"></div>
+                <div class="app-info">
+                    <div class="app-name-row">
+                        <span class="app-name" id="detail-name">应用名称</span>
+                    </div>
+                    <div class="detail-author-row" id="detail-developer" onclick="goToDeveloper('sevenqi')">开发者</div>
+                </div>
+                <button class="visit-btn online" id="detail-btn">访问</button>
+            </div>
+            <div class="detail-stats">
+                <div class="stat-item"><div class="stat-value" id="detail-rank">#1</div><div class="stat-label">排行榜</div></div>
+                <div class="stat-item"><div class="stat-value" id="detail-rating">4.9</div><div class="stat-label">评分</div></div>
+                <div class="stat-item"><div class="stat-value" id="detail-downloads">10万+</div><div class="stat-label">下载</div></div>
+                <div class="stat-item"><div class="stat-value" id="detail-version">1.0.0</div><div class="stat-label">版本</div></div>
+                <div class="stat-item"><div class="stat-value">12+</div><div class="stat-label">年龄</div></div>
+            </div>
+
+            <h3 class="detail-section-title">预览</h3>
+
+            <!-- ===== 应用自定义告示 ===== -->
+            <div id="status-banner" style="display:none; padding:12px 16px; border-radius:12px; margin-bottom:16px; font-size:14px; line-height:1.5; display:flex; align-items:center; gap:10px;">
+                <span id="status-banner-icon" style="font-size:18px;"></span>
+                <span id="status-banner-text" style="flex:1;"></span>
+            </div>
+
+            <div class="screenshots" id="screenshots-container"></div>
+
+            <h3 class="detail-section-title">应用介绍</h3>
+            <p class="detail-description" id="detail-description"></p>
+            <h3 class="detail-section-title">更新日志</h3>
+            <div class="update-log" id="detail-update-log"></div>
+            <button class="visit-btn online" id="show-all-updates-btn" style="margin-top:12px; width:100%;">查看全部更新日志</button>
+
+            <h3 class="detail-section-title">开发商</h3>
+            <div class="developer-card" id="detail-dev-card" onclick="goToDeveloper('sevenqi')">
+                <div class="dev-avatar" id="detail-dev-avatar"><img src="" alt="开发商头像"></div>
+                <div class="dev-info">
+                    <div class="dev-name-row">
+                        <span class="dev-name" id="detail-dev-name">开发者名称</span>
+                        <span class="verified-badge badge-gold" id="detail-dev-badge" title="网站站主专属">✓</span>
+                    </div>
+                    <div class="dev-desc" id="detail-dev-desc">开发者简介</div>
+                </div>
+                <div class="dev-arrow">›</div>
+            </div>
+
+            <!-- 协助开发区域 -->
+            <div id="collaborator-section" style="display:none;">
+                <h3 class="detail-section-title">协助开发</h3>
+                <div class="collaborator-grid" id="collaborator-grid"></div>
+            </div>
+
+            <h3 class="detail-section-title">信息</h3>
+            <div class="info-list">
+                <div class="info-item"><span class="info-label">大小</span><span class="info-value">2.3 MB</span></div>
+                <div class="info-item"><span class="info-label">类别</span><span class="info-value" id="detail-category">工具</span></div>
+                <div class="info-item"><span class="info-label">版本</span><span class="info-value" id="detail-info-version">1.0.0</span></div>
+                <div class="info-item"><span class="info-label">兼容性</span><span class="info-value">所有设备</span></div>
+                <div class="info-item"><span class="info-label">状态</span><span class="info-value" id="detail-status-text">已上线</span></div>
+                <div class="info-item"><span class="info-label">语言</span><span class="info-value">简体中文</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 开发者页面 -->
+    <div class="page" id="page-developer">
+        <div class="header">
+            <div class="header-content">
+                <div class="back-btn" onclick="goBack()">返回</div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="developer-header">
+                <div class="developer-avatar" id="dev-avatar"><img src="" alt="开发者头像"></div>
+                <div class="developer-name-row">
+                    <span class="developer-name" id="dev-name">开发者名称</span>
+                    <span class="verified-badge badge-gold" id="dev-badge" title="网站站主专属">✓</span>
+                    <span class="dev-rating-downloads" id="dev-rating-downloads">★ 4.8 · 下载量50万+</span>
+                </div>
+                <div class="developer-desc" id="dev-desc">开发者简介</div>
+            </div>
+            <div class="developer-stats">
+                <div class="stat-item"><div class="stat-value" id="dev-app-count">0</div><div class="stat-label">总应用数</div></div>
+            </div>
+
+            <h3 class="detail-section-title" id="dev-owned-title">开发者的应用</h3>
+            <div class="app-list developer-apps" id="dev-owned-apps"></div>
+
+            <h3 class="detail-section-title" id="dev-assist-title" style="display:none;">协助开发</h3>
+            <div class="app-list developer-apps" id="dev-assist-apps" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- 社区 -->
+    <div class="page" id="page-community">
+        <div class="header">
+            <div class="header-content">
+                <h1 class="app-title">社区</h1>
+                <div class="search-bar">
+                    <span class="search-icon">🔍</span>
+                    <input class="search-input" placeholder="搜索动态">
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="community-tabs">
+                <div class="community-tab active" onclick="switchCommunityTab('all',this)">全部</div>
+                <div class="community-tab" onclick="switchCommunityTab('official',this)">官方公告</div>
+                <div class="community-tab" onclick="switchCommunityTab('developer',this)">开发者</div>
+            </div>
+            <div class="post-list" id="post-list"></div>
+        </div>
+    </div>
+
+    <!-- 创作者 -->
+    <div class="page" id="page-mine">
+        <div class="header">
+            <div class="header-content">
+                <h1 class="app-title">创作者</h1>
+            </div>
+        </div>
+        <div class="container">
+            <h2 class="section-title">网站所有开发者</h2>
+            <div class="creator-list" id="creator-list"></div>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="bottom-nav" id="bottomNav">
+        <div class="bottom-nav-content">
+            <div class="nav-item active" onclick="switchTab('home')"><span class="nav-icon">🏠</span><span>首页</span></div>
+            <div class="nav-item" onclick="switchTab('apps')"><span class="nav-icon">📱</span><span>应用</span></div>
+            <div class="nav-item" onclick="switchTab('community')"><span class="nav-icon">💬</span><span>社区</span></div>
+            <div class="nav-item" onclick="switchTab('mine')"><span class="nav-icon">👤</span><span>创作者</span></div>
+        </div>
+    </div>
+
+    <!-- 更新日志模态框 -->
+    <div class="modal-overlay" id="update-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>全部更新日志</h3>
+                <button class="modal-close" id="modal-close-btn">&times;</button>
+            </div>
+            <div id="modal-update-list"></div>
+        </div>
+    </div>
+
+    <!-- ===== 自定义提示弹窗 ===== -->
+    <div class="alert-overlay" id="alert-overlay">
+        <div class="alert-card">
+            <span class="alert-icon">🔔</span>
+            <div class="alert-title">提示</div>
+            <div class="alert-message" id="alert-message">该应用暂无外部链接</div>
+            <button class="alert-btn" id="alert-btn">我知道了</button>
+        </div>
+    </div>
+
+    <!-- ===== 图片预览卡片弹窗 ===== -->
+    <div class="image-overlay" id="image-overlay" onclick="closeImagePreview()">
+        <div class="image-card" onclick="event.stopPropagation();">
+            <button class="image-close" onclick="closeImagePreview()">✕</button>
+            <img id="preview-image" src="" alt="图片预览">
+        </div>
+    </div>
+
+    <script>
+        // ======================== 数据（保留原始本地路径） ========================
+
+        const appsData = {
+            video: {
+                id: "video",
+                name: "七七视频解析",
+                icon: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E8%A7%86%E9%A2%91%E8%A7%A3%E6%9E%90/%E4%B8%83%E4%B8%83%E8%A7%86%E9%A2%91%E8%A7%A3%E6%9E%90/%E4%B8%83%E4%B8%83%E8%A7%86%E9%A2%91%E8%A7%A3%E6%9E%90%EF%BC%88%E7%94%B5%E8%84%91%E4%B8%93%E4%B8%9A%E7%89%88%EF%BC%89.html",
+                iconUrl: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E8%A7%86%E9%A2%91%E8%A7%A3%E6%9E%90/QQ20260628-152024.png",
+                developerId: "sevenqi",
+                developer: "Seven戚",
+                category: "tools",
+                categoryName: "工具",
+                status: "online",
+                statusText: "已上线",
+                rank: 1,
+                rating: 4.9,
+                downloads: "12.5万",
+                version: "2.5.0",
+                views: 12500,
+                website: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E8%A7%86%E9%A2%91%E8%A7%A3%E6%9E%90/%E4%B8%83%E4%B8%83%E8%A7%86%E9%A2%91%E8%A7%A3%E6%9E%90/%E4%B8%83%E4%B8%83%E8%A7%86%E9%A2%91%E8%A7%A3%E6%9E%90%EF%BC%88%E7%94%B5%E8%84%91%E4%B8%93%E4%B8%9A%E7%89%88%EF%BC%89.html",
+                shortDesc: "全网视频免费解析观看",
+                description: "七七视频解析是一款强大的全网视频解析工具，支持各大主流视频平台的免费解析观看。无需会员，无需下载，打开就能用，高清流畅不卡顿。\n\n主要功能：\n• 支持全网各大视频平台解析\n• 高清画质，流畅播放\n• 无需登录，即开即用\n• 持续更新维护",
+                notice: "",
+                updates: [
+                    { version: "v2.0.1", date: "2026-07-07", content: "• 更新了搜索影片接口" },
+                    { version: "v2.0.0", date: "2026-06-20", content: "• 新增支持3个视频平台\n• 优化解析速度，提升50%\n• 修复部分视频无法播放的问题" },
+                    { version: "v1.4.0", date: "2026-05-12", content: "• 全新界面设计\n• 新增功能\n• 修复已知Bug" },
+                    { version: "v1.3.0", date: "2025-09-10", content: "• 禁用了违规接口" }
+                ],
+                screenshots: [
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E8%A7%86%E9%A2%91%E8%A7%A3%E6%9E%90/QQ20260628-151756.png",
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E8%A7%86%E9%A2%91%E8%A7%A3%E6%9E%90/%E8%A7%86%E9%A2%91%E8%A7%A3%E6%9E%90%E5%8E%9F%E7%90%86%E5%9B%BE.png"
+                ],
+                collaborators: [
+                    { id: "sevenqi", name: "Seven戚", role: "接口提供" },
+                    { id: "ZZ", name: "扣子", role: "框架设计" },
+                    { id: "DouBao", name: "豆包", role: "前端优化" },
+                    { id: "deep", name: "Deep Seek", role: "UI优化" }
+                ]
+            },
+            novel: {
+                id: "novel",
+                name: "七七小说网",
+                icon: "📖",
+                iconUrl: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E5%B0%8F%E8%AF%B4/QQ20260628-152250.png",
+                developerId: "sevenqi",
+                developer: "Seven戚",
+                category: "reading",
+                categoryName: "阅读",
+                status: "online",
+                statusText: "已上线",
+                rank: 2,
+                rating: 4.8,
+                downloads: "8.3万",
+                version: "1.8.0",
+                views: 8300,
+                website: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E5%B0%8F%E8%AF%B4%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%B0%8F%E8%AF%B4%E7%BD%91.html",
+                shortDesc: "海量小说免费阅读",
+                description: "七七小说网，海量小说免费看！涵盖都市、玄幻、言情、悬疑等各类题材，每日更新，让你告别书荒。\n\n主要功能：\n• 海量小说资源，全本免费阅读\n• 多种阅读模式，护眼舒适\n• 智能推荐，发现更多好书\n• 书架管理，阅读进度同步",
+                notice: "",
+                updates: [
+                    { version: "v1.8.0", date: "2026-06-18", content: "• 项目一次性开发完成，有完整交互" }
+                ],
+                screenshots: [
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E5%B0%8F%E8%AF%B4/%E4%B8%83%E4%B8%83%E5%B0%8F%E8%AF%B4%E7%BD%91%E9%A6%96%E9%A1%B5%E9%A2%84%E8%A7%88.png",
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E5%B0%8F%E8%AF%B4/%E5%B0%8F%E8%AF%B4%E7%AB%A0%E8%8A%82.png",
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E5%B0%8F%E8%AF%B4/%E5%B0%8F%E8%AF%B4%E8%AF%A6%E6%83%85.png"
+                ],
+                collaborators: [
+                    { id: "trae", name: "trae", role: "界面设计" }
+                ]
+            },
+            SJ: {
+                id: "SJ",
+                name: "暗区突袭",
+                icon: "📖",
+                iconUrl: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E5%AE%89%E5%8C%BA%E7%AA%81%E8%A2%AD/%E5%B0%84%E5%87%BB%E6%B8%B8%E6%88%8F%E5%9B%BE%E6%A0%87%E7%94%9F%E6%88%90.png",
+                developerId: "sevenqi",
+                developer: "Seven戚",
+                category: "game",
+                categoryName: "游戏",
+                status: "error",
+                statusText: "已下架",
+                rank: 2,
+                rating: 4.6,
+                downloads: "2.0万",
+                version: "1.2.0",
+                views: 1000,
+                website: "",
+                shortDesc: "模拟枪战小游戏",
+                description: "真实枪战模拟，小容量高操作，玩三角洲端游前，先来这里练一练。\n\n主要功能：\n• 仅122MB大小\n• 纯html游戏框架\n•高难度游戏\n• 适合日常练枪和断网游戏",
+                notice: "游戏出现较为严重的bug，暂停开放",
+                updates: [
+                    { version: "v1.2.0", date: "2026-07-11", content: "更新多种武器并削弱了ai" },
+                    { version: "v1.0.0", date: "2026-07-10", content: "项目正式开发" }
+                ],
+                screenshots: [
+                    "",
+                    "",
+                    ""
+                ],
+                collaborators: [
+                    { id: "XM", name: "xiaomimimo", role: "框架确定" },
+                    { id: "trae", name: "trae", role: "后续更新" }
+                ]
+            },
+            SGS: {
+                id: "SGS",
+                name: "七七三国杀",
+                icon: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%89%E5%9B%BD%E6%9D%80/%E4%B8%83%E4%B8%83%E4%B8%89%E5%9B%BD%E6%9D%80_%E4%BF%AE%E5%A4%8D.html",
+                iconUrl: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E4%B8%89%E5%9B%BD%E6%9D%80/%E6%A0%87%E9%A2%98.png",
+                developerId: "sevenqi",
+                developer: "Seven戚",
+                category: "game",
+                categoryName: "游戏",
+                status: "online",
+                statusText: "已上线",
+                rank: 5,
+                rating: 4.7,
+                downloads: "7.2万",
+                version: "1.0.0",
+                views: 8300,
+                website: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E4%B8%89%E5%9B%BD%E6%9D%80/%E4%B8%83%E4%B8%83%E4%B8%89%E5%9B%BD%E6%9D%80.html",
+                shortDesc: "七七三国杀是一个家庭向娱乐软件",
+                description: "七七三国杀是一个家庭向娱乐软件，适合和朋友用同一个设备玩。\n\n主要功能：\n• 同一设备交替游戏\n• 线下多人游戏",
+                notice: "",
+                updates: [
+                    { version: "v1.0.0", date: "2026-07-12", content: "游戏正式上线"},
+                    { version: "v0.2.3", date: "2026-06-18", content: "• 修复武将已知问题" }
+                ],
+                screenshots: [
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E4%B8%89%E5%9B%BD%E6%9D%80/%E4%B8%89%E5%9B%BD%E6%9D%80%E4%B8%BB%E9%A1%B5.png",
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E4%B8%89%E5%9B%BD%E6%9D%80/%E6%AD%A6%E5%B0%86.png",
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E4%B8%89%E5%9B%BD%E6%9D%80/%E6%88%98%E6%96%97.png",
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E4%B8%89%E5%9B%BD%E6%9D%80/%E8%81%8A%E5%A4%A9.png"
+                ],
+                collaborators: [
+                    { id: "trae", name: "trae", role: "基础框架搭建" },
+                    { id: "deep", name: "Deep Seek", role: "代码分析" }
+                ]
+            },
+            ZXW: {
+                id: "ZXW",
+                name: "智学网",
+                icon: "",
+                iconUrl: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E4%BB%BF%E4%BD%9C%E9%A1%B5%E9%9D%A2/%E5%9B%BE%E6%A0%872.png",
+                developerId: "sevenqi",
+                developer: "Seven戚",
+                category: "tools",
+                categoryName: "工具",
+                status: "online",
+                statusText: "已上线",
+                rank: 4,
+                rating: 4.9,
+                downloads: "4.3万",
+                version: "1.0.0",
+                views: 6700,
+                website: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%BB%BF%E4%BD%9C%E9%A1%B5%E9%9D%A2/index.html",
+                shortDesc: "七七仿作页面是Seven戚制作的百分之百仿作大厂软件的网站",
+                description: "七七仿作页面是Seven戚制作的百分之百仿作大厂软件的网站",
+                notice: "宫格导航栏已停止更新，但本网站仍可正常使用。",
+                updates: [
+                    { version: "v1.0.1", date: "2026-07-07", content: "因为Seven戚的个人业务变更原因，本软件的宫格导航栏将于2026年7月7日后不再更新，想要使用我们全新的软件更新请使用“七七仿作页面”，七七仿作页面网站是我们的仿真页面中转站但是本网站的智学网仍能使用哦，只是不会再继续更近和更新了" },
+                    { version: "v1.0.0", date: "2026-06-28", content: "本网站正式上线" }
+                ],
+                screenshots: [
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E4%BB%BF%E4%BD%9C%E9%A1%B5%E9%9D%A2/%E5%B1%95%E7%A4%BA.png",
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E4%BB%BF%E4%BD%9C%E9%A1%B5%E9%9D%A2/%E5%B1%95%E7%A4%BA2.png"
+                ],
+                collaborators: []
+            },
+            ZM: {
+                id: "ZM",
+                name: "大陆霸业",
+                icon: "",
+                iconUrl: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E5%A4%A7%E9%99%86%E9%9C%B8%E4%B8%9A/QQ20260709-131130.png",
+                developerId: "sevenqi",
+                developer: "Seven戚",
+                category: "game",
+                categoryName: "游戏",
+                status: "online",
+                statusText: "已上线",
+                rank: 5,
+                rating: 4.9,
+                downloads: "2.4万",
+                version: "1.0.0",
+                views: 6700,
+                website: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E5%A4%A7%E9%99%86%E9%9C%B8%E4%B8%9A/%E5%A4%A7%E9%99%86%E9%9C%B8%E4%B8%9A.html",
+                shortDesc: "策略模拟战争游戏",
+                description: "策略模拟战争游戏。\n\n主要玩法：\n• 模拟外交页面\n• 真实战争地图",
+                notice: "",
+                updates: [
+                    { version: "v1.0.0", date: "2026-07-08", content: "网站正式上线" },
+                ],
+                screenshots: [
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E5%A4%A7%E9%99%86%E9%9C%B8%E4%B8%9A/QQ20260709-131310.png",
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E5%A4%A7%E9%99%86%E9%9C%B8%E4%B8%9A/QQ20260709-131359.png",
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E5%A4%A7%E9%99%86%E9%9C%B8%E4%B8%9A/QQ20260709-131328.png",
+                ],
+                collaborators: [
+                    { id: "XM", name: "xiaomimimo", role: "逻辑搭建" },
+                    { id: "deep", name: "Deep Seek", role: "后续开发" }
+                ]
+            },
+            university: {
+                id: "university",
+                name: "蛙青大学",
+                icon: "🐸",
+                iconUrl: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E5%A4%A7%E5%AD%A6/%E5%A4%A7%E5%AD%A6%E5%9B%BE%E6%A0%87.png",
+                developerId: "waqing",
+                developer: "蛙青工作室",
+                category: "education",
+                categoryName: "教育",
+                status: "online",
+                statusText: "已上线",
+                rank: 3,
+                rating: 4.7,
+                downloads: "3.2万",
+                version: "0.9.0",
+                views: 3200,
+                website: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E8%9B%99%E9%9D%92%E5%A4%A7%E5%AD%A6/%E8%9B%99%E9%9D%92%E5%A4%A7%E5%AD%A6.html",
+                shortDesc: "蛙青大学官方网站",
+                description: "蛙青大学是一个有趣的民办三次元大学，有很多校园权威人士。\n\n主要功能：\n• 人工智能系博士\n• 数学教授\n• 理科博士\n• 超多奖项",
+                notice: "",
+                updates: [
+                    { version: "v1.0.0 ", date: "2026-04-25", content: "• UI重做\n• 优化论文适配\n• 加入我们！" }
+                ],
+                screenshots: [
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E5%A4%A7%E5%AD%A6/QQ20260709-143747.png",
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E5%A4%A7%E5%AD%A6/QQ20260709-143835.png",
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E5%A4%A7%E5%AD%A6/QQ20260709-143848.png"
+                ],
+                collaborators: [
+                    { id: "XM", name: "xiaomimimo", role: "整体设计" }
+                ]
+            },
+            ZDYB: {
+                id: "ZDYB",
+                name: "自定义博客",
+                icon: "🐸",
+                iconUrl: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E8%87%AA%E5%AE%9A%E4%B9%89%E5%8D%9A%E5%AE%A2/QQ20260709-151005.png",
+                developerId: "sevenqi",
+                developer: "Seven戚",
+                category: "tools",
+                categoryName: "工具",
+                status: "online",
+                statusText: "已上线",
+                rank: 3,
+                rating: 4.7,
+                downloads: "4.1万",
+                version: "1.0.0",
+                views: 3200,
+                website: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E8%87%AA%E5%AE%9A%E4%B9%89%E5%8D%9A%E5%AE%A2/%E8%87%AA%E5%AE%9A%E4%B9%89%E5%8D%9A%E5%AE%A2.html",
+                shortDesc: "自定义DIY自己的博客",
+                description: "Seven戚曾经说过：我希望以我自己的能力让所有人也能写出自己的网站。\n\n主要功能：\n• 自定义博客风格\n• 自定义内容\n• 更多功能.......",
+                notice: "",
+                updates: [
+                    { version: "v1.0.0 ", date: "2026-07-02", content: "网站正式上线" }
+                ],
+                screenshots: [
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E8%87%AA%E5%AE%9A%E4%B9%89%E5%8D%9A%E5%AE%A2/QQ20260709-150552.png",
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E8%87%AA%E5%AE%9A%E4%B9%89%E5%8D%9A%E5%AE%A2/QQ20260709-150935.png",
+                ],
+                collaborators: [
+                    { id: "XM", name: "xiaomimimo", role: "整体设计" }
+                ]
+            },
+            tools: {
+                id: "tools",
+                name: "七七工具箱",
+                icon: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E8%BD%AF%E4%BB%B6%E7%AE%B1.html",
+                iconUrl: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E5%B7%A5%E5%85%B7%E7%AE%B1/%E5%B7%A5%E5%85%B7%E7%AE%B1%E5%9B%BE%E6%A0%87.png",
+                developerId: "sevenqi",
+                developer: "Seven戚",
+                category: "tools",
+                categoryName: "工具",
+                status: "online",
+                statusText: "已上线",
+                rank: 5,
+                rating: 4.9,
+                downloads: "6.7万",
+                version: "3.2.0",
+                views: 6700,
+                website: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E8%BD%AF%E4%BB%B6%E7%AE%B1.html#",
+                shortDesc: "集合各种实用小工具",
+                description: "七七工具箱，一个顶一百个！集合了各种实用小工具，日常生活学习必备神器。\n\n主要功能：\n• 单位换算、计算器\n• 二维码生成/识别\n• 图片压缩、格式转换\n• 文字处理、密码生成\n• 更多工具持续更新中...",
+                notice: "",
+                updates: [
+                    { version: "v3.2.0", date: "2026-06-22", content: "• 新增5款实用工具\n• 优化工具加载速度" },
+                    { version: "v3.1.0", date: "2026-05-30", content: "• 全新工具分类\n• 赛博朋克模式\n• 修复若干问题" }
+                ],
+                screenshots: [
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E5%B7%A5%E5%85%B7%E7%AE%B1/%E5%B7%A5%E5%85%B7%E7%AE%B1%E4%BB%8B%E7%BB%8D.png",
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E5%B7%A5%E5%85%B7%E7%AE%B1/%E9%A6%96%E9%A1%B5.png",
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E5%B7%A5%E5%85%B7%E7%AE%B1/%E5%B1%95%E7%A4%BA%E9%A1%B5%E9%9D%A21.png",
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E5%B7%A5%E5%85%B7%E7%AE%B1/%E8%BD%AC%E7%9B%98.png",
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E5%B7%A5%E5%85%B7%E7%AE%B1/%E4%BA%8C%E7%BB%B4%E7%A0%81.png"
+                ],
+                collaborators: [
+                    { id: "deep", name: "Deep Seek", role: "应用开发" }
+                ]
+            },
+            wx: {
+                id: "wx",
+                name: "微微信",
+                icon: "",
+                iconUrl: "https://bizaladdin-image.baidu.com/0/pic/-1335079917_-2033055879_1922850240.png",
+                developerId: "sevenqi",
+                developer: "Seven戚",
+                category: "tools",
+                categoryName: "工具",
+                status: "online",
+                statusText: "已上线",
+                rank: 5,
+                rating: 4.9,
+                downloads: "7.7万",
+                version: "1.2.0",
+                views: 6700,
+                website: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E5%BE%AE%E5%BE%AE%E4%BF%A1/%E8%81%8A%E5%A4%A9%E7%95%8C%E9%9D%A2%E6%9B%B4%E6%96%B0%E7%89%88.html",
+                shortDesc: "高精度仿真微信的软件",
+                description: "微微信＝单机版微信，日常生活学习必备神器。\n\n主要功能：\n• 模拟聊天页面\n• 整蛊好友\n• 模拟群聊\n• 更多工具持续更新中...",
+                notice: "",
+                updates: [
+                    { version: "v1.2.0", date: "2026-07-06", content: "• 修复了已知问题" },
+                    { version: "v1.0.0", date: "2026-07-05", content: "• 正式发布" }
+                ],
+                screenshots: [
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E8%99%9A%E6%8B%9F%E5%BE%AE%E4%BF%A1/QQ20260707-135134.png",
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E8%99%9A%E6%8B%9F%E5%BE%AE%E4%BF%A1/QQ20260707-135330.png",
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E8%99%9A%E6%8B%9F%E5%BE%AE%E4%BF%A1/QQ20260707-135344.png",
+                ],
+                collaborators: [
+                    { id: "deep", name: "Deep Seek", role: "应用开发" },
+                    { id: "trae", name: "trae", role: "design设计" }
+                ]
+            },
+            DLM: {
+                id: "DLM",
+                name: "edwardp20个人博客",
+                icon: "",
+                iconUrl: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E5%A4%A7%E8%93%9D%E8%8E%93/edwardp20%E5%A4%B4%E5%83%8F.png",
+                developerId: "edwardp20",
+                developer: "edwardp20",
+                category: "me",
+                categoryName: "个人",
+                status: "online",
+                statusText: "已上线",
+                rank: 7,
+                rating: 4.9,
+                downloads: "1.7万",
+                version: "3.2.0",
+                views: 6700,
+                website: "https://edwardp20.qzz.io",
+                shortDesc: "edwardp20的个人博客，记录生活，大蓝莓天天开心哦！",
+                description: "edwardp20的个人博客，记录生活,每天都要更新生活日志哦，哈哈哈。",
+                notice: "",
+                updates: [
+                    { version: "v1.0.0", date: "2026-06-28", content: "本网站正式展示" }
+                ],
+                screenshots: [
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E5%A4%A7%E8%93%9D%E8%8E%93/%E9%A6%96%E9%A1%B5.png",
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E5%A4%A7%E8%93%9D%E8%8E%93/%E4%BB%8B%E7%BB%8D.png"
+                ],
+                collaborators: [],
+            },
+            ZB: {
+                id: "ZB",
+                name: "暗网开户模拟器",
+                icon: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E6%9A%97%E7%BD%91/%E6%9A%97%E7%BD%91%E6%A8%A1%E6%8B%9F.html",
+                iconUrl: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E6%9A%97%E7%BD%91%E8%BD%AF%E4%BB%B6/%E5%9B%BE%E6%A0%87.png",
+                developerId: "sevenqi",
+                developer: "Seven戚",
+                category: "game",
+                categoryName: "游戏",
+                status: "online",
+                statusText: "已上线",
+                rank: 6,
+                rating: 4.4,
+                downloads: "1.2万",
+                version: "1.0.0",
+                views: 6700,
+                website: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E6%9A%97%E7%BD%91/%E6%9A%97%E7%BD%91%E6%A8%A1%E6%8B%9F.html",
+                shortDesc: "暗网模拟",
+                description: "你是黑客你是黑客，你是什么？",
+                notice: "",
+                updates: [
+                    { version: "v1.0.0", date: "2026-06-22", content: "本网站正式展示" }
+                ],
+                screenshots: [
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E6%9A%97%E7%BD%91%E8%BD%AF%E4%BB%B6/%E9%A6%96%E9%A1%B5.png",
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E6%9A%97%E7%BD%91%E8%BD%AF%E4%BB%B6/%E9%A6%96%E9%A1%B51.png",
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E6%9A%97%E7%BD%91%E8%BD%AF%E4%BB%B6/%E9%A6%96%E9%A1%B52.png",
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E6%9A%97%E7%BD%91%E8%BD%AF%E4%BB%B6/%E9%A6%96%E9%A1%B54.png",
+                ],
+                collaborators: [],
+            },
+            GRB: {
+                id: "GRB",
+                name: "Seven戚个人博客",
+                icon: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2.html",
+                iconUrl: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/%E5%9B%BE%E6%A0%87.png",
+                developerId: "sevenqi",
+                developer: "Seven戚",
+                category: "me",
+                categoryName: "个人",
+                status: "online",
+                statusText: "已上线",
+                rank: 6,
+                rating: 4.4,
+                downloads: "2.7万",
+                version: "1.0.0",
+                views: 6700,
+                website: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2.html",
+                shortDesc: "Seven戚的个人博客",
+                description: "Seven戚的个人博客支持多端互通，不过电脑端浏览效果最佳哦",
+                notice: "",
+                updates: [
+                    { version: "v1.0.0", date: "2026-07-02", content: "本网站正式展示" }
+                ],
+                screenshots: [
+                    "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/%E9%A6%96%E9%A1%B5.png",
+                ],
+                collaborators: [],
+            },
+
+        };
+
+        // 开发者数据
+        const developersData = {
+            sevenqi: {
+                id: "sevenqi",
+                name: "Seven戚",
+                avatar: "七",
+                avatarUrl: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/b_8ee0f1b16f3c823eeff690735ca17e1f.jpg",
+                badge: "gold",
+                badgeTitle: "网站站主专属",
+                description: "七七软件商城站主 · 热爱编程的独立开发者",
+                apps: ["video", "novel", "tools"]
+            },
+            waqing: {
+                id: "waqing",
+                name: "蛙青工作室",
+                avatar: "🐸",
+                avatarUrl: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E5%A4%A7%E5%AD%A6/%E5%A4%A7%E5%AD%A6%E5%9B%BE%E6%A0%87.png",
+                badge: "blue",
+                badgeTitle: "企业认证",
+                description: "蛙青编程系学生们的专属工作室",
+                apps: ["university"]
+            },
+            edwardp20: {
+                id: "edwardp20",
+                name: "edwardp20",
+                avatar: "大",
+                avatarUrl: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/%E5%A4%A7%E8%93%9D%E8%8E%93/edwardp20%E5%A4%B4%E5%83%8F.png",
+                badge: "gray",
+                badgeTitle: "个人开发者",
+                description: "后端开发工程师",
+                apps: ["DLM"]
+            },
+            XM: {
+                id: "XM",
+                name: "xiaomimimo",
+                avatar: "小米",
+                avatarUrl: "https://ecmb.bdimg.com/tam-ogel/128247567_1656370875_88_88.png",
+                badge: "",
+                badgeTitle: "合作开发者",
+                description: "我的代码又快有专业，平均 1000token/s",
+                apps: []
+            },
+            DouBao: {
+                id: "DouBao",
+                name: "豆包",
+                avatar: "豆包",
+                avatarUrl: "https://lf-flow-web-cdn.doubao.com/obj/flow-doubao/doubao/desktop_online_web/static/image/logo-doubao.7d723a57.png",
+                badge: "",
+                badgeTitle: "合作开发者",
+                description: "我能凭空写篇小说和文字在你网站里，网站效果你别问，别逗你豆姐笑了哈哈哈",
+                apps: []
+            },
+            deep: {
+                id: "deep",
+                name: "Deep Seek",
+                avatar: "前",
+                avatarUrl: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/AI%E5%8A%A9%E6%89%8B/D%E8%80%81%E5%B8%88.png",
+                badge: "",
+                badgeTitle: "合作开发者",
+                description: "你好啊，我是全能的编程师（我AI味有点重555）",
+                apps: []
+            },
+            trae: {
+                id: "trae",
+                name: "trae",
+                avatar: "后",
+                avatarUrl: "file:///C:/Users/Administrator/Desktop/%E6%88%91%E7%9A%84%E7%BD%91%E7%AB%99/%E4%B8%83%E4%B8%83%E5%BA%94%E7%94%A8%E5%95%86%E5%9F%8E_files/%E5%9B%BE%E7%89%87/AI%E5%8A%A9%E6%89%8B/QQ20260712-170825.png",
+                badge: "",
+                badgeTitle: "合作开发者",
+                description: "我的代码速度很快很专业",
+                apps: []
+            },
+            LG: {
+                id: "LG",
+                name: "灵光",
+                avatar: "产",
+                avatarUrl: "https://ecmb.bdimg.com/tam-ogel/1618607528_177283195_88_88.png",
+                badge: "",
+                badgeTitle: "合作开发者",
+                description: "产品交付设计，以及UI",
+                apps: []
+            },
+            ZZ: {
+                id: "ZZ",
+                name: "扣子",
+                avatar: "产",
+                avatarUrl: "https://ecmb.bdimg.com/tam-ogel/544271792_-2001000336_88_88.png",
+                badge: "",
+                badgeTitle: "合作开发者",
+                description: "我会开发多端应用，如小程序，移动端和web端",
+                apps: []
+            }
+        };
+
+        const postsData = [
+            {
+                id: 1,
+                type: "official",
+                username: "七七官方",
+                avatar: "官",
+                avatarUrl: "https://picsum.photos/seed/official/200/200",
+                avatarColor: "linear-gradient(135deg,#FF3B30,#D70015)",
+                badge: "red",
+                badgeText: "官方",
+                time: "2小时前",
+                content: "📢【重要公告】七七软件商城v2.0版本即将上线！\n\n全新社区功能、开发者认证体系、更流畅的体验...\n\n敬请期待！🎉\n\n#七七软件商城 #版本更新",
+                likes: 328,
+                comments: 56,
+                shares: 12
+            },
+            {
+                id: 2,
+                type: "developer",
+                username: "Seven戚",
+                avatar: "七",
+                avatarUrl: "https://picsum.photos/seed/sevenqi_avatar/200/200",
+                avatarColor: "linear-gradient(135deg,#FFD700,#FFA500)",
+                badge: "gold",
+                badgeText: "站主",
+                time: "5小时前",
+                content: "七七视频解析v2.5已更新上线！\n\n这次优化了解析速度，提升了50%哦～\n大家快去试试吧！有问题随时反馈～\n\n#七七视频解析 #更新",
+                likes: 156,
+                comments: 32,
+                shares: 8
+            },
+            {
+                id: 3,
+                type: "developer",
+                username: "蛙青工作室",
+                avatar: "🐸",
+                avatarUrl: "https://picsum.photos/seed/waqing_avatar/200/200",
+                avatarColor: "linear-gradient(135deg,#34C759,#30D158)",
+                badge: "blue",
+                badgeText: "企业",
+                time: "昨天",
+                content: "🐸蛙青大学内测招募中！\n\n我们正在寻找100名内测用户，抢先体验全新课程系统，还有专属福利哦～\n\n感兴趣的小伙伴评论区扣1！\n\n#蛙青大学 #内测招募",
+                likes: 89,
+                comments: 45,
+                shares: 5
+            }
+        ];
+
+        // ======================== 全局状态 ========================
+
+        let pageHistory = ["home"];
+        let currentTab = "home";
+        let currentCategory = "all";
+        let currentCommunityFilter = "all";
+        let detailScrollHandler = null;
+        const bottomNav = document.getElementById("bottomNav");
+
+        // ======================== 自定义提示弹窗 ========================
+
+        function showAlert(message) {
+            const overlay = document.getElementById('alert-overlay');
+            const msgEl = document.getElementById('alert-message');
+            msgEl.textContent = message || '该应用暂无外部链接';
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAlert() {
+            const overlay = document.getElementById('alert-overlay');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById('alert-btn').addEventListener('click', closeAlert);
+        document.getElementById('alert-overlay').addEventListener('click', function(e) {
+            if (e.target === this) closeAlert();
+        });
+
+        // ======================== 图片预览卡片弹窗 ========================
+
+        function openImagePreview(src) {
+            if (!src) return;
+            const overlay = document.getElementById('image-overlay');
+            const img = document.getElementById('preview-image');
+            img.src = src;
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeImagePreview() {
+            const overlay = document.getElementById('image-overlay');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById('image-overlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeImagePreview();
+            }
+        });
+
+        // ======================== 工具函数 ========================
+
+        function hideBottomNav() { bottomNav.classList.add("hidden"); }
+        function showBottomNav() { bottomNav.classList.remove("hidden"); }
+
+        function getBadgeHTML(dev) {
+            if (!dev || !dev.badge) return '';
+            const badgeClass = 'badge-' + dev.badge;
+            const title = dev.badgeTitle || '认证';
+            return `<span class="verified-badge ${badgeClass}" title="${title}">✓</span>`;
+        }
+
+        function createAppItem(app, showRank, rankNum) {
+            let btnText = "访问", btnCls = "online";
+            if (app.status === "beta") { btnText = "内测"; btnCls = "beta"; }
+            else if (app.status === "offline") { btnText = "已下架"; btnCls = "offline"; }
+            else if (app.status === "error") { btnText = "无法使用"; btnCls = "error"; }
+
+            const devInfo = developersData[app.developerId];
+            const badgeHtml = getBadgeHTML(devInfo);
+            const rankHtml = showRank ? `<div class="rank-number ${rankNum === 1 ? 'top-1' : rankNum === 2 ? 'top-2' : rankNum === 3 ? 'top-3' : ''}">${rankNum}</div>` : '';
+
+            const isOnline = app.status === 'online';
+            const ratingHtml = isOnline ? `<span class="app-rating-downloads">★ ${app.rating} · 下载量${app.downloads}</span>` : '';
+
+            const item = document.createElement("div");
+            item.className = "app-list-item";
+            item.onclick = () => goToAppDetail(app.id);
+
+            const websiteUrl = app.website || '';
+            const btnOnclick = websiteUrl
+                ? `event.stopPropagation();window.open('${websiteUrl}','_blank')`
+                : `event.stopPropagation();showAlert('该应用暂无外部链接')`;
+
+            item.innerHTML = `
+                ${rankHtml}
+                <div class="app-icon"><img src="${app.iconUrl}" alt="${app.name}" loading="lazy" onerror="this.style.display='none';this.parentNode.style.background='#e5e5ea';this.parentNode.innerHTML='${app.icon}'"></div>
+                <div class="app-info">
+                    <div class="app-name-row">
+                        <span class="app-name">${app.name}</span>
+                        ${ratingHtml}
+                    </div>
+                    <div class="app-author-row">
+                        <span class="app-author-name" onclick="event.stopPropagation();goToDeveloper('${app.developerId}')">${app.developer}</span>
+                        ${badgeHtml}
+                    </div>
+                    <div class="app-desc">${app.shortDesc}</div>
+                </div>
+                <button class="visit-btn ${btnCls}" onclick="${btnOnclick}">${btnText}</button>
+            `;
+            return item;
+        }
+
+        // ======================== 页面切换 ========================
+
+        function switchTab(tabName) {
+            currentTab = tabName;
+            pageHistory = [tabName];
+            document.querySelectorAll(".nav-item").forEach((item, i) => {
+                const tabs = ["home", "apps", "community", "mine"];
+                item.classList.toggle("active", tabs[i] === tabName);
+            });
+            showPage(tabName);
+            showBottomNav();
+            if (tabName === "apps") renderAppsList("all");
+            if (tabName === "community") renderPosts();
+            if (tabName === "home") renderHomeList();
+            if (tabName === "mine") renderCreators();
+            detachScrollListener();
+        }
+
+        function showPage(pageName) {
+            document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+            const target = document.getElementById("page-" + pageName);
+            if (target) target.classList.add("active");
+            window.scrollTo(0, 0);
+        }
+
+        function goBack() {
+            if (pageHistory.length > 1) {
+                pageHistory.pop();
+                const prev = pageHistory[pageHistory.length - 1];
+                if (["home", "apps", "community", "mine"].includes(prev)) {
+                    currentTab = prev;
+                    document.querySelectorAll(".nav-item").forEach((item, i) => {
+                        const tabs = ["home", "apps", "community", "mine"];
+                        item.classList.toggle("active", tabs[i] === prev);
+                    });
+                    showBottomNav();
+                } else {
+                    hideBottomNav();
+                }
+                showPage(prev);
+                detachScrollListener();
+            }
+        }
+
+        // ======================== 首页渲染 ========================
+
+        function renderHomeList() {
+            const wrap = document.getElementById("home-app-list");
+            wrap.innerHTML = "";
+            let list = Object.values(appsData).filter(app => app.status === 'online');
+
+            list.sort((a, b) => {
+                function parseDownload(str) {
+                    if (!str) return 0;
+                    const s = str.trim();
+                    if (s.includes('万')) {
+                        const num = parseFloat(s.replace('万', '')) || 0;
+                        return num * 10000;
+                    }
+                    return parseFloat(s) || 0;
+                }
+                const dlA = parseDownload(a.downloads);
+                const dlB = parseDownload(b.downloads);
+                return dlB - dlA;
+            });
+
+            if (list.length === 0) {
+                wrap.innerHTML = '<div style="padding:20px;text-align:center;color:#888;">暂无可访问的应用</div>';
+                return;
+            }
+            list.forEach((app, idx) => {
+                const item = createAppItem(app, true, idx + 1);
+                wrap.appendChild(item);
+            });
+        }
+
+        // ======================== 应用分类列表 ========================
+
+        function filterCategory(cat, el) {
+            currentCategory = cat;
+            document.querySelectorAll(".category-tab").forEach(t => t.classList.remove("active"));
+            el.classList.add("active");
+            renderAppsList(cat);
+        }
+
+        function renderAppsList(cat) {
+            const wrap = document.getElementById("all-apps-list");
+            wrap.innerHTML = "";
+            let list = Object.values(appsData);
+            if (cat === "online") list = list.filter(a => a.status === "online");
+            else if (cat === "beta") list = list.filter(a => a.status === "beta");
+            else if (["tools", "reading", "education"].includes(cat)) list = list.filter(a => a.category === cat);
+            else if (cat === "me") list = list.filter(a => a.category === "me");
+            else if (cat === "game") list = list.filter(a => a.category === "game");
+            list.sort((a, b) => (b.views || 0) - (a.views || 0));
+            if (list.length === 0) {
+                wrap.innerHTML = '<div style="padding:40px;text-align:center;color:#888;">暂无相关应用</div>';
+                return;
+            }
+            list.forEach(app => {
+                const item = createAppItem(app, false);
+                wrap.appendChild(item);
+            });
+        }
+
+        // ======================== 应用详情 ========================
+
+        function attachScrollListener(appName, appStatus, btnText, btnCls) {
+            detachScrollListener();
+            const stickyTitle = document.getElementById("sticky-title");
+            const stickyBtn = document.getElementById("sticky-visit-btn");
+            const detailHeader = document.getElementById("detail-header");
+
+            stickyTitle.textContent = appName;
+            stickyBtn.textContent = btnText;
+            stickyBtn.className = "visit-btn " + btnCls + " sticky-visit-btn";
+
+            const handler = function() {
+                const rect = detailHeader.getBoundingClientRect();
+                if (rect.bottom <= 0) {
+                    stickyTitle.style.display = "block";
+                    stickyBtn.style.display = "block";
+                } else {
+                    stickyTitle.style.display = "none";
+                    stickyBtn.style.display = "none";
+                }
+            };
+            detailScrollHandler = handler;
+            window.addEventListener("scroll", handler);
+            handler();
+        }
+
+        function detachScrollListener() {
+            if (detailScrollHandler) {
+                window.removeEventListener("scroll", detailScrollHandler);
+                detailScrollHandler = null;
+            }
+            const stickyTitle = document.getElementById("sticky-title");
+            const stickyBtn = document.getElementById("sticky-visit-btn");
+            if (stickyTitle) stickyTitle.style.display = "none";
+            if (stickyBtn) stickyBtn.style.display = "none";
+        }
+
+        function goToAppDetail(appId) {
+            const app = appsData[appId];
+            if (!app) return;
+            const dev = developersData[app.developerId];
+
+            hideBottomNav();
+            detachScrollListener();
+
+            const iconContainer = document.getElementById("detail-icon");
+            iconContainer.innerHTML = `<img src="${app.iconUrl}" alt="${app.name}" onerror="this.style.display='none';this.parentNode.style.background='#e5e5ea';this.parentNode.innerHTML='${app.icon}'">`;
+            document.getElementById("detail-name").textContent = app.name;
+
+            const devRow = document.getElementById("detail-developer");
+            const badgeHtml = getBadgeHTML(dev);
+            devRow.innerHTML = `${dev.name} ${badgeHtml}`;
+            devRow.onclick = () => goToDeveloper(app.developerId);
+
+            let btnText = "访问", btnCls = "online";
+            if (app.status === "beta") { btnText = "内测"; btnCls = "beta"; }
+            else if (app.status === "offline") { btnText = "已下架"; btnCls = "offline"; }
+            else if (app.status === "error") { btnText = "无法使用"; btnCls = "error"; }
+            const btnDom = document.getElementById("detail-btn");
+            btnDom.textContent = btnText;
+            btnDom.className = "visit-btn " + btnCls;
+
+            const websiteUrl = app.website || '';
+            btnDom.onclick = function(e) {
+                e.stopPropagation();
+                if (websiteUrl) {
+                    window.open(websiteUrl, '_blank');
+                } else {
+                    showAlert('该应用暂无外部链接');
+                }
+            };
+
+            document.getElementById("detail-description").textContent = app.description;
+
+            // ===== 自定义告示（每个软件独有） =====
+            const statusBanner = document.getElementById('status-banner');
+            const statusIcon = document.getElementById('status-banner-icon');
+            const statusText = document.getElementById('status-banner-text');
+
+            // 如果 notice 有值且不为空字符串，显示自定义告示
+            if (app.notice && app.notice.trim()) {
+                statusBanner.style.display = 'flex';
+                // 根据状态决定边框颜色
+                if (app.status === 'beta') {
+                    statusBanner.style.border = '2px solid #FF9500';
+                    statusBanner.style.background = 'rgba(255,149,0,0.08)';
+                } else if (app.status === 'error' || app.status === 'offline') {
+                    statusBanner.style.border = '2px solid #FF3B30';
+                    statusBanner.style.background = 'rgba(255,59,48,0.08)';
+                } else {
+                    // online 状态使用蓝色边框
+                    statusBanner.style.border = '2px solid #007AFF';
+                    statusBanner.style.background = 'rgba(0,122,255,0.08)';
+                }
+                statusBanner.style.borderRadius = '12px';
+                // 提取 emoji 作为图标
+                const firstChar = app.notice.trim().charAt(0);
+                const emojiRegex = /[\u{1F000}-\u{1FFFF}]|[\u2600-\u27BF]|[\u{2700}-\u{27BF}]|[\u{FE00}-\u{FEFF}]|[\u{1F300}-\u{1F5FF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]|[\u{1F700}-\u{1F77F}]|[\u{1F780}-\u{1F7FF}]|[\u{1F800}-\u{1F8FF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA00}-\u{1FA6F}]|[\u{1FA70}-\u{1FAFF}]|[\u{1FB00}-\u{1FBFF}]|[\u{1FC00}-\u{1FCFF}]|[\u{1FD00}-\u{1FDFF}]|[\u{1FE00}-\u{1FEFF}]/u;
+                if (emojiRegex.test(firstChar)) {
+                    statusIcon.textContent = firstChar;
+                    const withoutEmoji = app.notice.replace(/[\u{1F000}-\u{1FFFF}]|[\u2600-\u27BF]|[\u{2700}-\u{27BF}]|[\u{FE00}-\u{FEFF}]|[\u{1F300}-\u{1F5FF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]|[\u{1F700}-\u{1F77F}]|[\u{1F780}-\u{1F7FF}]|[\u{1F800}-\u{1F8FF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA00}-\u{1FA6F}]|[\u{1FA70}-\u{1FAFF}]|[\u{1FB00}-\u{1FBFF}]|[\u{1FC00}-\u{1FCFF}]|[\u{1FD00}-\u{1FDFF}]|[\u{1FE00}-\u{1FEFF}]/u, '').trim();
+                    statusText.textContent = withoutEmoji || app.notice;
+                } else {
+                    // 没有emoji时用默认图标
+                    if (app.status === 'beta') {
+                        statusIcon.textContent = '🔶';
+                    } else if (app.status === 'error' || app.status === 'offline') {
+                        statusIcon.textContent = '🚫';
+                    } else {
+                        statusIcon.textContent = 'ℹ️';
+                    }
+                    statusText.textContent = app.notice;
+                }
+            } else {
+                // notice 为空或未设置，不显示任何告示
+                statusBanner.style.display = 'none';
+            }
+
+            const isOnline = app.status === 'online';
+            document.getElementById("detail-rank").textContent = isOnline ? "#" + app.rank : "-";
+            document.getElementById("detail-rating").textContent = isOnline ? app.rating : "-";
+            document.getElementById("detail-downloads").textContent = isOnline ? app.downloads : "-";
+            document.getElementById("detail-version").textContent = app.version;
+            document.getElementById("detail-category").textContent = app.categoryName;
+            document.getElementById("detail-status-text").textContent = app.statusText;
+            document.getElementById("detail-info-version").textContent = app.version;
+
+            const screenshotsContainer = document.getElementById("screenshots-container");
+            screenshotsContainer.innerHTML = "";
+            const shots = app.screenshots || ["https://picsum.photos/seed/default1/300/540", "https://picsum.photos/seed/default2/300/540", "https://picsum.photos/seed/default3/300/540"];
+            shots.forEach(url => {
+                const div = document.createElement("div");
+                div.className = "screenshot";
+                div.onclick = function(e) {
+                    e.stopPropagation();
+                    openImagePreview(url);
+                };
+                div.innerHTML = `<img src="${url}" alt="截图" loading="lazy" onerror="this.outerHTML='<span style=\'color:#888;font-size:12px;\'>截图</span>'">`;
+                screenshotsContainer.appendChild(div);
+            });
+
+            // 更新日志
+            const updateWrap = document.getElementById("detail-update-log");
+            updateWrap.innerHTML = "";
+            let allUpdates = app.updates || [];
+            allUpdates.sort((a, b) => {
+                const va = a.version.replace(/[^0-9.]/g, '').split('.').map(Number);
+                const vb = b.version.replace(/[^0-9.]/g, '').split('.').map(Number);
+                for (let i = 0; i < Math.max(va.length, vb.length); i++) {
+                    const na = va[i] || 0, nb = vb[i] || 0;
+                    if (na !== nb) return nb - na;
+                }
+                return 0;
+            });
+            if (allUpdates.length > 0) {
+                const latest = allUpdates[0];
+                const div = document.createElement("div");
+                div.className = "update-item";
+                div.innerHTML = `
+                    <div class="update-version"><span>${latest.version}</span><span class="update-date">${latest.date}</span></div>
+                    <div class="update-content">${latest.content}</div>
+                `;
+                updateWrap.appendChild(div);
+            } else {
+                updateWrap.innerHTML = '<div style="padding:12px 0;color:#888;">暂无更新日志</div>';
+            }
+            window._currentAppUpdates = allUpdates;
+
+            // 开发商卡片
+            const devAvatar = document.getElementById("detail-dev-avatar");
+            devAvatar.innerHTML = `<img src="${dev.avatarUrl}" alt="${dev.name}" onerror="this.style.display='none';this.parentNode.style.background='#e5e5ea';this.parentNode.textContent='${dev.avatar}'">`;
+            document.getElementById("detail-dev-name").textContent = dev.name;
+            document.getElementById("detail-dev-desc").textContent = dev.description;
+
+            const badgeDom = document.getElementById("detail-dev-badge");
+            if (dev.badge) {
+                badgeDom.className = "verified-badge badge-" + dev.badge;
+                badgeDom.title = dev.badgeTitle || '认证';
+                badgeDom.textContent = "✓";
+            } else {
+                badgeDom.style.display = 'none';
+            }
+            document.getElementById("detail-dev-card").onclick = () => goToDeveloper(app.developerId);
+
+            // 协助开发
+            const collaboratorSection = document.getElementById("collaborator-section");
+            const collaboratorGrid = document.getElementById("collaborator-grid");
+            collaboratorGrid.innerHTML = "";
+            if (app.collaborators && app.collaborators.length > 0) {
+                collaboratorSection.style.display = 'block';
+                app.collaborators.forEach(c => {
+                    const item = document.createElement("div");
+                    item.className = "collaborator-item";
+                    item.onclick = () => goToDeveloper(c.id);
+                    const devData = developersData[c.id];
+                    const avatarUrl = devData ? devData.avatarUrl : c.avatarUrl || '';
+                    const avatarChar = devData ? devData.avatar : c.name.charAt(0);
+                    item.innerHTML = `
+                        <div class="collaborator-avatar"><img src="${avatarUrl}" alt="${c.name}" onerror="this.style.display='none';this.parentNode.style.background='#e5e5ea';this.parentNode.textContent='${avatarChar}'"></div>
+                        <div class="collaborator-info">
+                            ${c.name}
+                            <span class="collaborator-role">${c.role || '合作'}</span>
+                        </div>
+                    `;
+                    collaboratorGrid.appendChild(item);
+                });
+            } else {
+                collaboratorSection.style.display = 'none';
+            }
+
+            attachScrollListener(app.name, app.statusText, btnText, btnCls);
+            pageHistory.push("app-detail");
+            showPage("app-detail");
+        }
+
+        // ======================== 开发者页面 ========================
+
+        function goToDeveloper(devId) {
+            const dev = developersData[devId];
+            if (!dev) return;
+
+            hideBottomNav();
+            detachScrollListener();
+
+            const devAvatar = document.getElementById("dev-avatar");
+            devAvatar.innerHTML = `<img src="${dev.avatarUrl}" alt="${dev.name}" onerror="this.style.display='none';this.parentNode.style.background='#e5e5ea';this.parentNode.textContent='${dev.avatar}'">`;
+            document.getElementById("dev-name").textContent = dev.name;
+
+            const badgeDom = document.getElementById("dev-badge");
+            if (dev.badge) {
+                badgeDom.className = "verified-badge badge-" + dev.badge;
+                badgeDom.title = dev.badgeTitle || '认证';
+                badgeDom.textContent = "✓";
+            } else {
+                badgeDom.style.display = 'none';
+            }
+
+            document.getElementById("dev-desc").textContent = dev.description;
+
+            const ownedApps = Object.values(appsData).filter(app => app.developerId === devId && (app.status === 'online' || app.status === 'beta'));
+            const assistApps = Object.values(appsData).filter(app =>
+                (app.status === 'online' || app.status === 'beta') &&
+                app.collaborators &&
+                app.collaborators.some(c => c.id === devId)
+            );
+
+            const allAppsMap = new Map();
+            [...ownedApps, ...assistApps].forEach(app => {
+                if (app && !allAppsMap.has(app.id)) {
+                    allAppsMap.set(app.id, app);
+                }
+            });
+            const allRelated = Array.from(allAppsMap.values());
+
+            const onlineApps = allRelated.filter(app => app.status === 'online');
+            const totalApps = onlineApps.length;
+            let totalRating = 0, totalDownloads = 0;
+            onlineApps.forEach(app => {
+                totalRating += app.rating || 0;
+                let dlNum = 0;
+                if (app.downloads) {
+                    const dlStr = app.downloads.trim();
+                    if (dlStr.includes('万')) {
+                        const num = parseFloat(dlStr.replace('万', '')) || 0;
+                        dlNum = num * 10000;
+                    } else {
+                        dlNum = parseFloat(dlStr) || 0;
+                    }
+                }
+                totalDownloads += dlNum;
+            });
+
+            const avgRating = totalApps > 0 ? (totalRating / totalApps).toFixed(1) : '-';
+            let totalDlStr = '';
+            if (totalDownloads >= 10000) {
+                totalDlStr = (totalDownloads / 10000).toFixed(1) + '万';
+            } else if (totalDownloads > 0) {
+                totalDlStr = totalDownloads + '';
+            } else {
+                totalDlStr = '-';
+            }
+
+            const ratingDownloadElem = document.getElementById("dev-rating-downloads");
+            if (avgRating !== '-' && totalDlStr !== '-') {
+                ratingDownloadElem.textContent = `★ ${avgRating} · 下载量${totalDlStr}`;
+            } else {
+                ratingDownloadElem.textContent = '';
+            }
+
+            document.getElementById("dev-app-count").textContent = totalApps;
+
+            const ownedWrap = document.getElementById("dev-owned-apps");
+            ownedWrap.innerHTML = "";
+            const ownedTitle = document.getElementById("dev-owned-title");
+            if (ownedApps.length > 0) {
+                ownedTitle.style.display = 'block';
+                ownedApps.forEach(app => {
+                    const item = createAppItem(app, false);
+                    ownedWrap.appendChild(item);
+                });
+            } else {
+                ownedTitle.style.display = 'none';
+            }
+
+            const assistWrap = document.getElementById("dev-assist-apps");
+            const assistTitle = document.getElementById("dev-assist-title");
+            assistWrap.innerHTML = "";
+            if (assistApps.length > 0) {
+                assistTitle.style.display = 'block';
+                assistWrap.style.display = 'block';
+                assistApps.forEach(app => {
+                    const item = createAppItem(app, false);
+                    assistWrap.appendChild(item);
+                });
+            } else {
+                assistTitle.style.display = 'none';
+                assistWrap.style.display = 'none';
+            }
+
+            pageHistory.push("developer");
+            showPage("developer");
+        }
+
+        // ======================== 模态框控制（更新日志） ========================
+
+        const modalOverlay = document.getElementById('update-modal');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+        const modalList = document.getElementById('modal-update-list');
+
+        function openUpdateModal() {
+            const updates = window._currentAppUpdates || [];
+            modalList.innerHTML = '';
+            if (updates.length === 0) {
+                modalList.innerHTML = '<div style="padding:20px;text-align:center;color:#888;">暂无更新记录</div>';
+            } else {
+                updates.forEach(u => {
+                    const div = document.createElement('div');
+                    div.className = 'modal-update-item';
+                    div.innerHTML = `
+                        <div class="modal-update-version"><span>${u.version}</span><span class="modal-update-date">${u.date}</span></div>
+                        <div class="modal-update-content">${u.content}</div>
+                    `;
+                    modalList.appendChild(div);
+                });
+            }
+            modalOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeUpdateModal() {
+            modalOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById('show-all-updates-btn').addEventListener('click', openUpdateModal);
+        modalCloseBtn.addEventListener('click', closeUpdateModal);
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === modalOverlay) closeUpdateModal();
+        });
+
+        // ======================== 社区 ========================
+
+        function switchCommunityTab(filter, el) {
+            currentCommunityFilter = filter;
+            document.querySelectorAll(".community-tab").forEach(t => t.classList.remove("active"));
+            el.classList.add("active");
+            renderPosts();
+        }
+
+        function renderPosts() {
+            const wrap = document.getElementById("post-list");
+            wrap.innerHTML = "";
+            let list = [...postsData];
+            if (currentCommunityFilter === "official") list = list.filter(p => p.type === "official");
+            if (currentCommunityFilter === "developer") list = list.filter(p => p.type === "developer");
+            if (list.length === 0) {
+                wrap.innerHTML = '<div style="padding:40px;text-align:center;color:#888;">暂无动态</div>';
+                return;
+            }
+            list.forEach(post => {
+                let badgeHtml = "";
+                if (post.badge === "red") {
+                    badgeHtml = `<span class="verified-badge badge-red" title="官方认证">✓</span>`;
+                } else if (post.badge === "gold") {
+                    badgeHtml = `<span class="verified-badge badge-gold" title="网站站主专属">✓</span>`;
+                } else if (post.badge === "blue") {
+                    badgeHtml = `<span class="verified-badge badge-blue" title="企业认证">✓</span>`;
+                }
+                const usernameClass = post.username === "七七官方" ? "post-username username-official" : "post-username";
+
+                const card = document.createElement("div");
+                card.className = "post-card " + (post.type === "official" ? "official" : "");
+                card.innerHTML = `
+                    <div class="post-header">
+                        <div class="post-avatar"><img src="${post.avatarUrl}" alt="${post.username}" onerror="this.style.display='none';this.parentNode.style.background='${post.avatarColor}';this.parentNode.textContent='${post.avatar}'"></div>
+                        <div class="post-user-info">
+                            <div class="post-user-row">
+                                <span class="${usernameClass}">${post.username}</span>
+                                ${badgeHtml}
+                            </div>
+                            <div class="post-time">${post.time}</div>
+                        </div>
+                    </div>
+                    <div class="post-content">${post.content}</div>
+                    <div class="post-actions">
+                        <div class="post-action"><span class="post-action-icon">❤️</span>${post.likes}</div>
+                        <div class="post-action"><span class="post-action-icon">💬</span>${post.comments}</div>
+                        <div class="post-action"><span class="post-action-icon">↗</span>${post.shares}</div>
+                    </div>
+                `;
+                wrap.appendChild(card);
+            });
+        }
+
+        // ======================== 创作者列表 ========================
+
+        function renderCreators() {
+            const wrap = document.getElementById("creator-list");
+            wrap.innerHTML = "";
+            const devs = Object.values(developersData);
+            if (devs.length === 0) {
+                wrap.innerHTML = '<div style="padding:40px;text-align:center;color:#888;">暂无开发者</div>';
+                return;
+            }
+            devs.forEach(dev => {
+                const item = document.createElement("div");
+                item.className = "creator-item";
+                item.onclick = () => goToDeveloper(dev.id);
+                const badgeHtml = getBadgeHTML(dev);
+                item.innerHTML = `
+                    <div class="creator-avatar"><img src="${dev.avatarUrl}" alt="${dev.name}" onerror="this.style.display='none';this.parentNode.style.background='#e5e5ea';this.parentNode.textContent='${dev.avatar}'"></div>
+                    <div class="creator-info">
+                        <div class="creator-name-row">
+                            <span class="creator-name">${dev.name}</span>
+                            ${badgeHtml}
+                        </div>
+                        <div class="creator-desc">${dev.description}</div>
+                    </div>
+                    <div class="creator-arrow">›</div>
+                `;
+                wrap.appendChild(item);
+            });
+        }
+
+        // ======================== 初始化 ========================
+
+        document.addEventListener("DOMContentLoaded", () => {
+            renderHomeList();
+            renderPosts();
+            renderCreators();
+            showPage("home");
+            showBottomNav();
+            console.log("✅ 七七软件商城加载完成");
+        });
+
+        document.addEventListener("keydown", function(e) {
+            if (e.key === "Escape") {
+                if (document.getElementById('image-overlay').classList.contains('active')) {
+                    closeImagePreview();
+                } else if (document.getElementById('alert-overlay').classList.contains('active')) {
+                    closeAlert();
+                } else if (modalOverlay.classList.contains('active')) {
+                    closeUpdateModal();
+                } else {
+                    goBack();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
