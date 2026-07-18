@@ -1753,12 +1753,11 @@
                 downloads: "7.7万",
                 version: "1.2.0",
                 views: 6700,
-                website: "https://sevenseven712.github.io/WX/",
+                website: "",
                 shortDesc: "高精度仿真微信的软件",
                 description: "微微信＝单机版微信，日常生活学习必备神器。\n\n主要功能：\n• 模拟聊天页面\n• 整蛊好友\n• 模拟群聊\n• 更多工具持续更新中...",
-                notice: "",
+                notice: "下线调整",
                 updates: [
-                    { version: "v1.3.0", date: "2026-07-15", content: "• 网站重新上线" },     
                     { version: "v1.2.0", date: "2026-07-06", content: "• 修复了已知问题" },
                     { version: "v1.0.0", date: "2026-07-05", content: "• 正式发布" }
                 ],
@@ -1771,7 +1770,40 @@
                     { id: "deep", name: "Deep Seek", role: "应用开发" },
                     { id: "trae", name: "trae", role: "design设计" }
                 ]
+            }, 
+            SP: {
+                id: "SP",
+                name: "七七视频网",
+                icon: "💬",
+                iconUrl: "https://i.ibb.co/v6gnGS4V/QQ20260718-130318.png",
+                developerId: "sevenqi",
+                developer: "Seven戚",
+                category: "tools",
+                categoryName: "工具",
+                status: "online",
+                statusText: "已上线",
+                rank: 5,
+                rating: 4.9,
+                downloads: "7.0万",
+                version: "1.0.0",
+                views: 6700,
+                website: "https://sevenseven712.github.io/shipwang/#/home",
+                shortDesc: "视频交友·类似B站",
+                description: "休闲神器",
+                notice: "",
+                updates: [
+                    { version: "v1.0.0", date: "2026-07-18", content: "• 正式发布" },
+                ],
+                screenshots: [
+                    "https://i.ibb.co/Z6hqnRRm/QQ20260718-130338.png",
+                    "https://i.ibb.co/xSRNzrSZ/QQ20260718-130405.png",
+                ],
+                collaborators: [
+                    { id: "deep", name: "Deep Seek", role: "应用开发" },
+                    { id: "XM", name: "xiaomimimo", role: "框架设计" }
+                ]
             },
+
             DLM: {
                 id: "DLM",
                 name: "edwardp20个人博客",
@@ -2159,7 +2191,7 @@
             let list = Object.values(APPS);
             if (cat === 'online') list = list.filter(a => a.status === 'online');
             else if (cat === 'beta') list = list.filter(a => a.status === 'beta');
-            else if (['tools', 'reading', 'education', 'me', 'game'].includes(cat))
+            else if (['tools', 'reading', 'education', 'me', 'game','happy'].includes(cat))
                 list = list.filter(a => a.category === cat);
             list.sort((a, b) => (b.views || 0) - (a.views || 0));
 
