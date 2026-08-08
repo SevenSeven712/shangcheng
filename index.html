@@ -1,0 +1,1447 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>七七软件商城</title>
+    <!-- ===== 样式（与原来完全一致，仅调整了 status-banner 的初始 display） ===== -->
+    <style>
+        /* ===== 全局重置 & 基础样式 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #f2f2f7;
+            color: #000;
+            padding-bottom: 85px;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        input,
+        textarea {
+            -webkit-user-select: text;
+            user-select: text;
+        }
+
+        /* ===== 通用组件 ===== */
+        .verified-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+            cursor: default;
+            margin-left: 4px;
+            background: #8E8E93;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+        }
+        .badge-gold {
+            background: linear-gradient(135deg, #FFD700, #FF9900);
+        }
+        .badge-blue {
+            background: linear-gradient(135deg, #00D8FF, #007AFF);
+        }
+        .badge-gray {
+            background: linear-gradient(135deg, #9a9aa0, #727278);
+        }
+        .badge-red {
+            background: linear-gradient(135deg, #FF3B30, #D70015);
+        }
+
+        /* ===== 页面切换 ===== */
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* ===== 头部 ===== */
+        .header {
+            position: sticky;
+            top: 0;
+            background: rgba(242, 242, 247, 0.82);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            z-index: 90;
+            border-bottom: 0.5px solid rgba(0, 0, 0, 0.08);
+        }
+        .header-content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .app-title {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+            margin: 0;
+            flex: 1;
+        }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            color: #007AFF;
+            font-size: 17px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .back-btn::before {
+            content: '‹';
+            font-size: 28px;
+            margin-right: 4px;
+        }
+        .sticky-title {
+            font-size: 18px;
+            font-weight: 600;
+            flex: 1;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: none;
+        }
+        .sticky-visit-btn {
+            flex-shrink: 0;
+            display: none;
+        }
+
+        /* ===== 搜索栏 ===== */
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: #e4e4ea;
+            border-radius: 10px;
+            padding: 7px 12px;
+            flex: 1;
+            min-width: 120px;
+        }
+        .search-bar:focus-within {
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.18);
+        }
+        .search-icon {
+            color: #8e8e93;
+            margin-right: 8px;
+            font-size: 14px;
+        }
+        .search-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            outline: none;
+        }
+
+        /* ===== 容器 & 标题 ===== */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 16px 20px;
+        }
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 24px 0 12px;
+        }
+        .section-title:first-child {
+            margin-top: 8px;
+        }
+
+        /* ===== 分类标签 ===== */
+        .category-tabs {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            margin-bottom: 16px;
+        }
+        .category-tab {
+            padding: 7px 16px;
+            background: #e5e5ea;
+            border-radius: 18px;
+            font-size: 14px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .category-tab.active {
+            background: #007AFF;
+            color: #fff;
+        }
+
+        /* ===== 精选卡片 ===== */
+        .featured-card {
+            background: linear-gradient(135deg, #007AFF, #5856D6);
+            border-radius: 16px;
+            height: 200px;
+            padding: 24px;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        .featured-card::before {
+            content: "";
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 160px;
+            height: 160px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
+        }
+        .featured-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 6px 0;
+            z-index: 2;
+            position: relative;
+        }
+        .featured-desc {
+            font-size: 14px;
+            opacity: 0.9;
+            z-index: 2;
+            position: relative;
+        }
+        .featured-tag {
+            z-index: 2;
+            position: relative;
+            font-size: 13px;
+            opacity: 0.85;
+        }
+
+        /* ===== 应用列表项 ===== */
+        .app-list {
+            background: #fff;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+        .app-list-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            border-bottom: 0.5px solid #eee;
+            cursor: pointer;
+            transition: background 0.2s;
+            min-height: 80px;
+        }
+        .app-list-item:last-child {
+            border-bottom: none;
+        }
+        .app-list-item:hover {
+            background: #f8f8fa;
+        }
+
+        .rank-number {
+            width: 28px;
+            height: 28px;
+            line-height: 28px;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 700;
+            color: #999;
+            flex-shrink: 0;
+            border-radius: 50%;
+            background: transparent;
+        }
+        .top-1 {
+            color: #fff;
+            background: #FF9500;
+        }
+        .top-2 {
+            color: #fff;
+            background: #A8A8A8;
+        }
+        .top-3 {
+            color: #fff;
+            background: #CD7F32;
+        }
+
+        .app-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            flex-shrink: 0;
+            overflow: hidden;
+            background: #e5e5ea;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+        .app-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .app-info {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .app-name-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 2px;
+        }
+        .app-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #000;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .app-rating-downloads {
+            font-size: 12px;
+            color: #888;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .app-author-row {
+            font-size: 13px;
+            font-weight: 500;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 2px;
+        }
+        .app-author-name {
+            cursor: pointer;
+        }
+        .app-author-name:hover {
+            color: #007AFF;
+        }
+        .app-desc {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .visit-btn {
+            padding: 6px 16px;
+            border-radius: 18px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            min-width: 60px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .visit-btn.online {
+            background: #e5e5ea;
+            color: #007AFF;
+        }
+        .visit-btn.beta {
+            background: rgba(255, 149, 0, 0.15);
+            color: #FF9500;
+        }
+        .visit-btn.offline,
+        .visit-btn.error {
+            color: #888;
+            cursor: not-allowed;
+        }
+
+        /* ===== 详情页 ===== */
+        .detail-header {
+            display: flex;
+            align-items: center;
+            padding: 16px 0;
+            gap: 16px;
+        }
+        .detail-header .app-icon {
+            width: 90px;
+            height: 90px;
+            border-radius: 20px;
+            font-size: 40px;
+        }
+        .detail-header .app-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 6px;
+        }
+        .detail-author-row {
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+        .detail-author-row:hover {
+            color: #007AFF;
+        }
+
+        .detail-stats {
+            display: flex;
+            justify-content: space-around;
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .stat-item {
+            text-align: center;
+            padding: 4px 8px;
+        }
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #007AFF;
+            margin-bottom: 4px;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .screenshots {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+        .screenshot {
+            width: 150px;
+            height: 270px;
+            border-radius: 10px;
+            flex-shrink: 0;
+            overflow: hidden;
+            background: #eee;
+            cursor: pointer;
+            transition: transform 0.15s;
+            position: relative;
+        }
+        .screenshot:hover {
+            transform: scale(1.02);
+        }
+        .screenshot img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .detail-section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 20px 0 10px;
+        }
+        .detail-description {
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-line;
+            color: #333;
+        }
+
+        .update-log {
+            background: #fff;
+            border-radius: 14px;
+            padding: 4px 16px;
+        }
+        .update-item {
+            padding: 12px 0;
+            border-bottom: 0.5px solid #eee;
+        }
+        .update-item:last-child {
+            border-bottom: none;
+        }
+        .update-version {
+            display: flex;
+            justify-content: space-between;
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .update-date {
+            font-size: 12px;
+            color: #888;
+            font-weight: 400;
+        }
+        .update-content {
+            font-size: 13px;
+            line-height: 1.6;
+            white-space: pre-line;
+            color: #333;
+        }
+
+        .developer-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .developer-card:hover {
+            background: #f8f8fa;
+        }
+        .dev-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            overflow: hidden;
+            background: #e5e5ea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .dev-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .dev-name-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+        .dev-name {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .dev-desc {
+            font-size: 13px;
+            color: #888;
+        }
+        .dev-arrow {
+            color: #ccc;
+            font-size: 20px;
+            margin-left: auto;
+        }
+
+        .collaborator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 8px;
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+        }
+        .collaborator-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+            padding: 8px 12px;
+            border-radius: 10px;
+            background: #f8f8fa;
+        }
+        .collaborator-item:hover {
+            background: #e8e8ee;
+        }
+        .collaborator-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: #e5e5ea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        .collaborator-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .collaborator-info {
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .collaborator-role {
+            font-size: 11px;
+            color: #888;
+            display: block;
+            margin-top: 1px;
+        }
+
+        .info-list {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border-bottom: 0.5px solid #eee;
+            font-size: 14px;
+        }
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            color: #888;
+        }
+        .info-value {
+            font-weight: 500;
+        }
+
+        /* ===== 开发者页 ===== */
+        .developer-header {
+            text-align: center;
+            padding: 20px 0;
+        }
+        .developer-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 12px;
+            overflow: hidden;
+            background: #e5e5ea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+        }
+        .developer-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .developer-name-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 6px;
+        }
+        .developer-name {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .dev-rating-downloads {
+            font-size: 14px;
+            color: #888;
+            font-weight: 400;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: 6px;
+        }
+        .developer-desc {
+            font-size: 14px;
+            color: #888;
+        }
+        .developer-stats {
+            display: flex;
+            justify-content: center;
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        /* ===== 社区 ===== */
+        .community-tabs {
+            display: flex;
+            background: #fff;
+            border-radius: 14px;
+            padding: 4px;
+            margin-bottom: 16px;
+        }
+        .community-tab {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            font-size: 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            color: #888;
+        }
+        .community-tab.active {
+            background: #007AFF;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .post-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .post-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px;
+        }
+        .post-card.official {
+            border: 1px solid rgba(255, 59, 48, 0.25);
+            background: #fff9f9;
+        }
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .post-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: #e5e5ea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .post-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .post-user-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 2px;
+        }
+        .post-username {
+            font-size: 15px;
+            font-weight: 600;
+        }
+        .username-official {
+            color: #FF3B30 !important;
+        }
+        .post-time {
+            font-size: 12px;
+            color: #888;
+        }
+        .post-content {
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            white-space: pre-line;
+        }
+        .post-actions {
+            display: flex;
+            justify-content: space-around;
+            padding-top: 10px;
+            border-top: 0.5px solid #eee;
+        }
+        .post-action {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+            color: #888;
+            cursor: pointer;
+        }
+        .post-action:hover {
+            color: #007AFF;
+        }
+
+        /* ===== 创作者列表 ===== */
+        .creator-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .creator-item {
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .creator-item:hover {
+            background: #f8f8fa;
+        }
+        .creator-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            overflow: hidden;
+            background: #e5e5ea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .creator-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .creator-info {
+            flex: 1;
+        }
+        .creator-name-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+        .creator-name {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .creator-desc {
+            font-size: 13px;
+            color: #888;
+        }
+        .creator-arrow {
+            color: #ccc;
+            font-size: 20px;
+        }
+
+        /* ===== 底部导航 ===== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(249, 249, 249, 0.94);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 0.5px solid rgba(0, 0, 0, 0.1);
+            z-index: 999;
+            padding-bottom: env(safe-area-inset-bottom);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        .bottom-nav.hidden {
+            transform: translateY(100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+        .bottom-nav-content {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            padding: 6px 0 12px;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #8E8E93;
+            font-size: 10px;
+            cursor: pointer;
+            padding: 4px 12px;
+        }
+        .nav-item.active {
+            color: #007AFF;
+        }
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 3px;
+        }
+
+        /* ===== 模态框（更新日志） ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-card {
+            background: #fff;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            padding: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow-y: auto;
+            position: relative;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .modal-header h3 {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #888;
+            cursor: pointer;
+            padding: 0 8px;
+        }
+        .modal-close:hover {
+            color: #000;
+        }
+        .modal-update-item {
+            padding: 12px 0;
+            border-bottom: 0.5px solid #eee;
+        }
+        .modal-update-item:last-child {
+            border-bottom: none;
+        }
+        .modal-update-version {
+            display: flex;
+            justify-content: space-between;
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .modal-update-date {
+            font-size: 12px;
+            color: #888;
+            font-weight: 400;
+        }
+        .modal-update-content {
+            font-size: 13px;
+            line-height: 1.6;
+            white-space: pre-line;
+            color: #333;
+        }
+
+        /* ===== 自定义提示弹窗 ===== */
+        .alert-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .alert-overlay.active {
+            display: flex;
+        }
+        .alert-card {
+            background: #fff;
+            border-radius: 20px;
+            max-width: 340px;
+            width: 100%;
+            padding: 28px 24px 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.92);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        .alert-icon {
+            font-size: 44px;
+            margin-bottom: 12px;
+            display: block;
+        }
+        .alert-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 6px;
+        }
+        .alert-message {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        .alert-btn {
+            background: #007AFF;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 10px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            min-width: 100px;
+        }
+        .alert-btn:hover {
+            background: #0055CC;
+        }
+        .alert-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* ===== 图片预览弹窗 ===== */
+        .image-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .image-overlay.active {
+            display: flex;
+        }
+        .image-card {
+            background: #fff;
+            border-radius: 20px;
+            max-width: 90vw;
+            max-height: 90vh;
+            width: auto;
+            padding: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+        }
+        .image-card img {
+            max-width: 100%;
+            max-height: calc(90vh - 80px);
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border-radius: 12px;
+            display: block;
+        }
+        .image-close {
+            align-self: flex-end;
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #888;
+            cursor: pointer;
+            padding: 4px 8px;
+            margin-bottom: 8px;
+            transition: color 0.2s;
+            line-height: 1;
+        }
+        .image-close:hover {
+            color: #000;
+        }
+
+        /* ===== 响应式 ===== */
+        @media(max-width:600px) {
+            .app-title {
+                font-size: 24px;
+            }
+            .featured-card {
+                height: 170px;
+                padding: 18px;
+            }
+            .featured-title {
+                font-size: 20px;
+            }
+            .app-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 24px;
+            }
+            .app-name {
+                font-size: 14px;
+            }
+            .app-rating-downloads {
+                font-size: 11px;
+            }
+            .detail-header .app-icon {
+                width: 70px;
+                height: 70px;
+                font-size: 32px;
+            }
+            .detail-header .app-name {
+                font-size: 20px;
+            }
+            .screenshot {
+                width: 130px;
+                height: 230px;
+            }
+            .header-content {
+                flex-wrap: wrap;
+            }
+            .header-content .app-title {
+                font-size: 22px;
+            }
+            .sticky-title {
+                font-size: 16px;
+            }
+            .dev-rating-downloads {
+                font-size: 12px;
+                margin-left: 4px;
+            }
+            .developer-name {
+                font-size: 20px;
+            }
+            .modal-card {
+                max-height: 90vh;
+                padding: 16px;
+            }
+            .creator-avatar {
+                width: 44px;
+                height: 44px;
+                font-size: 18px;
+            }
+            .creator-name {
+                font-size: 14px;
+            }
+            .creator-desc {
+                font-size: 12px;
+            }
+            .collaborator-grid {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                padding: 12px;
+            }
+            .collaborator-avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+            .collaborator-info {
+                font-size: 12px;
+            }
+            .alert-card {
+                max-width: 300px;
+                padding: 24px 20px 16px;
+            }
+            .alert-icon {
+                font-size: 36px;
+            }
+            .image-card {
+                padding: 12px;
+                max-width: 95vw;
+            }
+            .image-close {
+                font-size: 24px;
+            }
+            .image-card img {
+                max-height: calc(90vh - 60px);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== 首页 ==================== -->
+    <div class="page active" id="page-home">
+        <div class="header">
+            <div class="header-content">
+                <h1 class="app-title">七七软件商城</h1>
+                <div class="search-bar">
+                    <span class="search-icon">🔍</span>
+                    <input class="search-input" placeholder="搜索应用、游戏和更多" id="search-home" />
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <h2 class="section-title">今日精选</h2>
+            <div class="featured-card" onclick="goToAppDetail('video')">
+                <div class="featured-tag">精选推荐</div>
+                <h3 class="featured-title">七七视频解析</h3>
+                <p class="featured-desc">全网视频免费看，支持各大平台解析</p>
+            </div>
+            <h2 class="section-title">热门排行</h2>
+            <div class="app-list" id="home-app-list"></div>
+        </div>
+    </div>
+
+    <!-- ==================== 应用列表页 ==================== -->
+    <div class="page" id="page-apps">
+        <div class="header">
+            <div class="header-content">
+                <h1 class="app-title">应用</h1>
+                <div class="search-bar">
+                    <span class="search-icon">🔍</span>
+                    <input class="search-input" placeholder="搜索应用" id="search-apps" />
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="category-tabs">
+                <div class="category-tab active" onclick="filterCategory('all',this)">全部</div>
+                <div class="category-tab" onclick="filterCategory('tools',this)">工具</div>
+                <div class="category-tab" onclick="filterCategory('reading',this)">阅读</div>
+                <div class="category-tab" onclick="filterCategory('education',this)">教育</div>
+                <div class="category-tab" onclick="filterCategory('game',this)">游戏</div>
+                <div class="category-tab" onclick="filterCategory('me',this)">个人</div>
+                <div class="category-tab" onclick="filterCategory('online',this)">已上线</div>
+            </div>
+            <div class="app-list" id="all-apps-list"></div>
+        </div>
+    </div>
+
+    <!-- ==================== 应用详情页 ==================== -->
+    <div class="page" id="page-app-detail">
+        <div class="header">
+            <div class="header-content">
+                <div class="back-btn" onclick="goBack()">返回</div>
+                <span class="sticky-title" id="sticky-title">应用名称</span>
+                <button class="visit-btn online sticky-visit-btn" id="sticky-visit-btn">访问</button>
+            </div>
+        </div>
+        <div class="container">
+            <div class="detail-header" id="detail-header">
+                <div class="app-icon" id="detail-icon"><img src="" alt="应用图标" /></div>
+                <div class="app-info">
+                    <div class="app-name-row">
+                        <span class="app-name" id="detail-name">应用名称</span>
+                    </div>
+                    <div class="detail-author-row" id="detail-developer" onclick="goToDeveloper('sevenqi')">开发者</div>
+                </div>
+                <button class="visit-btn online" id="detail-btn">访问</button>
+            </div>
+            <div class="detail-stats">
+                <div class="stat-item"><div class="stat-value" id="detail-rank">#1</div><div class="stat-label">排行榜</div></div>
+                <div class="stat-item"><div class="stat-value" id="detail-rating">4.9</div><div class="stat-label">评分</div></div>
+                <div class="stat-item"><div class="stat-value" id="detail-downloads">10万+</div><div class="stat-label">下载</div></div>
+                <div class="stat-item"><div class="stat-value" id="detail-version">1.0.0</div><div class="stat-label">版本</div></div>
+                <div class="stat-item"><div class="stat-value">12+</div><div class="stat-label">年龄</div></div>
+            </div>
+
+            <h3 class="detail-section-title">预览</h3>
+
+            <!-- 应用自定义告示（修复：初始 display:none，由JS控制显示） -->
+            <div id="status-banner" style="display:none; padding:12px 16px; border-radius:12px; margin-bottom:16px; font-size:14px; line-height:1.5; align-items:center; gap:10px;">
+                <span id="status-banner-icon" style="font-size:18px;"></span>
+                <span id="status-banner-text" style="flex:1;"></span>
+            </div>
+
+            <div class="screenshots" id="screenshots-container"></div>
+
+            <h3 class="detail-section-title">应用介绍</h3>
+            <p class="detail-description" id="detail-description"></p>
+            <h3 class="detail-section-title">更新日志</h3>
+            <div class="update-log" id="detail-update-log"></div>
+            <button class="visit-btn online" id="show-all-updates-btn" style="margin-top:12px; width:100%;">查看全部更新日志</button>
+
+            <h3 class="detail-section-title">开发商</h3>
+            <div class="developer-card" id="detail-dev-card" onclick="goToDeveloper('sevenqi')">
+                <div class="dev-avatar" id="detail-dev-avatar"><img src="" alt="开发商头像" /></div>
+                <div class="dev-info">
+                    <div class="dev-name-row">
+                        <span class="dev-name" id="detail-dev-name">开发者名称</span>
+                        <span class="verified-badge badge-gold" id="detail-dev-badge" title="网站站主专属">✓</span>
+                    </div>
+                    <div class="dev-desc" id="detail-dev-desc">开发者简介</div>
+                </div>
+                <div class="dev-arrow">›</div>
+            </div>
+
+            <!-- 协助开发 -->
+            <div id="collaborator-section" style="display:none;">
+                <h3 class="detail-section-title">协助开发</h3>
+                <div class="collaborator-grid" id="collaborator-grid"></div>
+            </div>
+
+            <h3 class="detail-section-title">信息</h3>
+            <div class="info-list">
+                <div class="info-item"><span class="info-label">大小</span><span class="info-value">2.3 MB</span></div>
+                <div class="info-item"><span class="info-label">类别</span><span class="info-value" id="detail-category">工具</span></div>
+                <div class="info-item"><span class="info-label">版本</span><span class="info-value" id="detail-info-version">1.0.0</span></div>
+                <div class="info-item"><span class="info-label">兼容性</span><span class="info-value">所有设备</span></div>
+                <div class="info-item"><span class="info-label">状态</span><span class="info-value" id="detail-status-text">已上线</span></div>
+                <div class="info-item"><span class="info-label">语言</span><span class="info-value">简体中文</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 开发者页面 ==================== -->
+    <div class="page" id="page-developer">
+        <div class="header">
+            <div class="header-content">
+                <div class="back-btn" onclick="goBack()">返回</div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="developer-header">
+                <div class="developer-avatar" id="dev-avatar"><img src="" alt="开发者头像" /></div>
+                <div class="developer-name-row">
+                    <span class="developer-name" id="dev-name">开发者名称</span>
+                    <span class="verified-badge badge-gold" id="dev-badge" title="网站站主专属">✓</span>
+                    <span class="dev-rating-downloads" id="dev-rating-downloads">★ 4.8 · 下载量50万+</span>
+                </div>
+                <div class="developer-desc" id="dev-desc">开发者简介</div>
+            </div>
+            <div class="developer-stats">
+                <div class="stat-item"><div class="stat-value" id="dev-app-count">0</div><div class="stat-label">总应用数</div></div>
+            </div>
+
+            <h3 class="detail-section-title" id="dev-owned-title">开发者的应用</h3>
+            <div class="app-list developer-apps" id="dev-owned-apps"></div>
+
+            <h3 class="detail-section-title" id="dev-assist-title" style="display:none;">协助开发</h3>
+            <div class="app-list developer-apps" id="dev-assist-apps" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- ==================== 社区 ==================== -->
+    <div class="page" id="page-community">
+        <div class="header">
+            <div class="header-content">
+                <h1 class="app-title">社区</h1>
+                <div class="search-bar">
+                    <span class="search-icon">🔍</span>
+                    <input class="search-input" placeholder="搜索动态" id="search-community" />
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="community-tabs">
+                <div class="community-tab active" onclick="switchCommunityTab('all',this)">全部</div>
+                <div class="community-tab" onclick="switchCommunityTab('official',this)">官方公告</div>
+                <div class="community-tab" onclick="switchCommunityTab('developer',this)">开发者</div>
+            </div>
+            <div class="post-list" id="post-list"></div>
+        </div>
+    </div>
+
+    <!-- ==================== 创作者 ==================== -->
+    <div class="page" id="page-mine">
+        <div class="header">
+            <div class="header-content">
+                <h1 class="app-title">创作者</h1>
+            </div>
+        </div>
+        <div class="container">
+            <h2 class="section-title">网站所有开发者</h2>
+            <div class="creator-list" id="creator-list"></div>
+        </div>
+    </div>
+
+    <!-- ==================== 底部导航 ==================== -->
+    <div class="bottom-nav" id="bottomNav">
+        <div class="bottom-nav-content">
+            <div class="nav-item active" onclick="switchTab('home')"><span class="nav-icon">🏠</span><span>首页</span></div>
+            <div class="nav-item" onclick="switchTab('apps')"><span class="nav-icon">📱</span><span>应用</span></div>
+            <div class="nav-item" onclick="switchTab('community')"><span class="nav-icon">💬</span><span>社区</span></div>
+            <div class="nav-item" onclick="switchTab('mine')"><span class="nav-icon">👤</span><span>创作者</span></div>
+        </div>
+    </div>
+
+    <!-- ==================== 更新日志模态框 ==================== -->
+    <div class="modal-overlay" id="update-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>全部更新日志</h3>
+                <button class="modal-close" id="modal-close-btn">&times;</button>
+            </div>
+            <div id="modal-update-list"></div>
+        </div>
+    </div>
+
+    <!-- ==================== 自定义提示弹窗 ==================== -->
+    <div class="alert-overlay" id="alert-overlay">
+        <div class="alert-card">
+            <span class="alert-icon">🔔</span>
+            <div class="alert-title">提示</div>
+            <div class="alert-message" id="alert-message">该应用暂无外部链接</div>
+            <button class="alert-btn" id="alert-btn">我知道了</button>
+        </div>
+    </div>
+
+    <!-- ==================== 图片预览弹窗 ==================== -->
+    <div class="image-overlay" id="image-overlay" onclick="closeImagePreview()">
+        <div class="image-card" onclick="event.stopPropagation();">
+            <button class="image-close" onclick="closeImagePreview()">✕</button>
+            <img id="preview-image" src="" alt="图片预览" />
+        </div>
+    </div>
+
+    <!-- ===== 引入 JavaScript 模块 ===== -->
+    <!-- 先加载数据模块，再加载逻辑模块 -->
+    <script src="软件.js"></script>
+    <script src="开发者.js"></script>
+
+    <!-- ================================================================ -->
+    <!-- 注意：所有 JavaScript 逻辑已移至 开发者.js                        -->
+    <!-- 此处不再内联脚本，避免与模块冲突                                 -->
+    <!-- ================================================================ -->
+
+</body>
+</html>
