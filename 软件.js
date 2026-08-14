@@ -140,7 +140,7 @@ const APPS = {
         iconUrl: "https://i.ibb.co/v8FGb8H/image.png",
         developerId: "sevenqi",
         developer: "Seven戚",
-        category: "game",
+        category: "games",
         categoryName: "游戏",
         status: "error",
         statusText: "已下架",
