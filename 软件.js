@@ -439,7 +439,7 @@ const APPS = {
         statusText: "已上线",
         rank: 5,
         rating: 4.9,
-        downloads: "7.0万",
+        downloads: "10.0万",
         version: "1.0.0",
         views: 6700,
         website: "https://sevenseven712.github.io/shipwang/#/home",
