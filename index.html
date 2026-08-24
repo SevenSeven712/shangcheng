@@ -1198,13 +1198,25 @@
                 }
             };
 
-            // ---------- 渲染首页（只显示已上架） ----------
+            // ---------- 渲染首页（只显示已上架，按下载量降序） ----------
             function renderHome() {
                 const container = document.getElementById('home-app-list');
-                // 关键修改：只保留 status === 'online' 的应用
+
+                // 工具：将下载量字符串转为数值（单位：次）
+                function parseDownloads(str) {
+                    if (!str) return 0;
+                    let s = str.replace(/[+,]/g, '');          // 去除 + 和逗号
+                    if (s.includes('万')) {
+                        const num = parseFloat(s.replace('万', ''));
+                        return num * 10000;
+                    }
+                    return parseFloat(s) || 0;
+                }
+
                 const apps = getAllApps()
                     .filter(app => app.status === 'online')
-                    .sort((a, b) => (a.rank || 999) - (b.rank || 999));
+                    .sort((a, b) => parseDownloads(b.downloads) - parseDownloads(a.downloads)); // 下载量降序
+
                 container.innerHTML = apps.map((app, index) => {
                     const rankClass = index === 0 ? 'top-1' : index === 1 ? 'top-2' : index === 2 ? 'top-3' : '';
                     return `
