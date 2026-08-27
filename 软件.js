@@ -73,6 +73,39 @@ const APPS = {
             { id: "deep", name: "Deepseek", role: "网站框架" },
         ]
     },
+    LYB: {
+        id: "LYB",
+        name: "Seven戚频道",
+        icon: "??",
+        iconUrl: "https://i.ibb.co/NRnTfmV/QQ-20260827150812.png",
+        developerId: "sevenqi",
+        developer: "Seven戚",
+        category: "tools",
+        categoryName: "工具",
+        status: "online",
+        statusText: "已上线",
+        rank: 1,
+        rating: 4.9,
+        downloads: "9.5万",
+        version: "1.0.0",
+        views: 12500,
+        website: "https://sevenseven712.github.io/liuyanban/",
+        shortDesc: "Seven戚呕心沥血研究了后端编程后捣鼓出的 社区/频道 网站",
+        description: "Seven戚频道是一个由Seven戚个人开发的聊天交流网站，同时也是他第一次将后端编程运用到自己的网站中运营。",
+        notice: "",
+        updates: [
+            { version: "v1.0.0", date: "2026-08-27", content: "发布网站" },
+        ],
+        screenshots: [
+            "https://i.ibb.co/9KGxM1P/QQ-20260827110015.png",
+            "https://i.ibb.co/4n021hwD/QQ-20260827110011.png",
+            "https://i.ibb.co/0pdJj830/QQ-20260827110007.png",
+        ],
+        collaborators: [
+            { id: "deep", name: "Deepseek", role: "网站框架" },
+        ]
+    },
+
     novel: {
         id: "novel",
         name: "七七小说网",
