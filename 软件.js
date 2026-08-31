@@ -94,6 +94,7 @@ const APPS = {
         description: "Seven戚频道是一个由Seven戚个人开发的聊天交流网站，同时也是他第一次将后端编程运用到自己的网站中运营。",
         notice: "",
         updates: [
+            { version: "v1.1.0", date: "2026-08-30", content: "1.点击顶部个人头像进入“个人”页面\n2.群聊未读消息红点显示\n3.底部导航栏和顶部导航栏兼容为js文件\n4.帖子发布支持富文本" },
             { version: "v1.0.0", date: "2026-08-27", content: "发布网站" },
         ],
         screenshots: [
