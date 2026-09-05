@@ -2,8 +2,9 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>七七软件商城</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
         /* ===== 全局重置 & 基础样式 ===== */
         * {
@@ -33,7 +34,7 @@
             width: 18px;
             height: 18px;
             border-radius: 50%;
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 700;
             color: #fff;
             flex-shrink: 0;
@@ -41,6 +42,10 @@
             margin-left: 4px;
             background: #8E8E93;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+        }
+        .verified-badge i {
+            color: #fff;
+            font-size: 10px;
         }
         .badge-gold { background: linear-gradient(135deg, #FFD700, #FF9900); }
         .badge-blue { background: linear-gradient(135deg, #00D8FF, #007AFF); }
@@ -84,15 +89,14 @@
         .back-btn {
             display: inline-flex;
             align-items: center;
+            gap: 4px;
             color: #007AFF;
             font-size: 17px;
             cursor: pointer;
             flex-shrink: 0;
         }
-        .back-btn::before {
-            content: '‹';
-            font-size: 28px;
-            margin-right: 4px;
+        .back-btn i {
+            font-size: 18px;
         }
         .sticky-title {
             font-size: 18px;
@@ -123,7 +127,11 @@
             background: #fff;
             box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.18);
         }
-        .search-icon { color: #8e8e93; margin-right: 8px; font-size: 14px; }
+        .search-icon {
+            color: #8e8e93;
+            margin-right: 8px;
+            font-size: 14px;
+        }
         .search-input {
             flex: 1;
             border: none;
@@ -164,6 +172,37 @@
         }
         .category-tab.active { background: #007AFF; color: #fff; }
 
+        /* ===== 榜单切换标签（首页） ===== */
+        .rank-tabs {
+            display: flex;
+            gap: 8px;
+            margin: 8px 0 14px;
+        }
+        .rank-tab {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 18px;
+            background: #e5e5ea;
+            border-radius: 18px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #555;
+        }
+        .rank-tab i {
+            font-size: 14px;
+        }
+        .rank-tab.active {
+            background: #007AFF;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(0, 122, 255, 0.25);
+        }
+        .rank-tab:hover:not(.active) {
+            background: #d1d1d6;
+        }
+
         /* ===== 精选卡片 ===== */
         .featured-card {
             background: linear-gradient(135deg, #007AFF, #5856D6);
@@ -198,6 +237,7 @@
             background: #fff;
             border-radius: 14px;
             overflow: hidden;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
         }
         .app-list-item {
             display: flex;
@@ -270,6 +310,13 @@
             color: #888;
             white-space: nowrap;
             flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+        .app-rating-downloads i {
+            color: #FFB800;
+            font-size: 11px;
         }
         .app-author-row {
             font-size: 13px;
@@ -285,10 +332,27 @@
         .app-desc {
             font-size: 13px;
             color: #888;
-            margin-bottom: 5px;
+            margin-bottom: 2px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        .app-update-time {
+            font-size: 11px;
+            color: #aaa;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 1px;
+        }
+        .app-update-time i {
+            font-size: 11px;
+            color: #888;
+        }
+        .app-update-time .update-date {
+            font-weight: 500;
+            color: #007AFF;
         }
 
         .visit-btn {
@@ -429,7 +493,8 @@
         }
         .dev-name { font-size: 16px; font-weight: 600; }
         .dev-desc { font-size: 13px; color: #888; }
-        .dev-arrow { color: #ccc; font-size: 20px; margin-left: auto; }
+        .dev-arrow { color: #ccc; font-size: 18px; margin-left: auto; }
+        .dev-arrow i { color: #ccc; }
 
         .collaborator-grid {
             display: grid;
@@ -542,7 +607,7 @@
             margin-bottom: 20px;
         }
 
-        /* ===== 社区 ===== */
+        /* ===== 社区（保留页面但不再切换） ===== */
         .community-tabs {
             display: flex;
             background: #fff;
@@ -560,7 +625,6 @@
             color: #888;
         }
         .community-tab.active { background: #007AFF; color: #fff; font-weight: 600; }
-
         .post-list {
             display: flex;
             flex-direction: column;
@@ -616,7 +680,7 @@
             border-top: 0.5px solid #eee;
         }
         .post-action {
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 5px;
             font-size: 13px;
@@ -624,6 +688,9 @@
             cursor: pointer;
         }
         .post-action:hover { color: #007AFF; }
+        .post-action i {
+            font-size: 14px;
+        }
 
         /* ===== 创作者列表 ===== */
         .creator-list {
@@ -664,7 +731,8 @@
         }
         .creator-name { font-size: 16px; font-weight: 600; }
         .creator-desc { font-size: 13px; color: #888; }
-        .creator-arrow { color: #ccc; font-size: 20px; }
+        .creator-arrow { color: #ccc; font-size: 18px; }
+        .creator-arrow i { color: #ccc; }
 
         /* ===== 底部导航 ===== */
         .bottom-nav {
@@ -700,9 +768,11 @@
             font-size: 10px;
             cursor: pointer;
             padding: 4px 12px;
+            gap: 2px;
         }
         .nav-item.active { color: #007AFF; }
-        .nav-icon { font-size: 20px; margin-bottom: 3px; }
+        .nav-icon { font-size: 20px; margin-bottom: 0; }
+        .nav-icon i { font-size: 20px; }
 
         /* ===== 模态框 ===== */
         .modal-overlay {
@@ -742,7 +812,7 @@
         .modal-close {
             background: none;
             border: none;
-            font-size: 28px;
+            font-size: 24px;
             color: #888;
             cursor: pointer;
             padding: 0 8px;
@@ -800,6 +870,7 @@
             to { transform: scale(1); opacity: 1; }
         }
         .alert-icon { font-size: 44px; margin-bottom: 12px; display: block; }
+        .alert-icon i { font-size: 44px; color: #FF9500; }
         .alert-title { font-size: 18px; font-weight: 700; color: #000; margin-bottom: 6px; }
         .alert-message { font-size: 14px; color: #666; line-height: 1.5; margin-bottom: 20px; }
         .alert-btn {
@@ -816,6 +887,79 @@
         }
         .alert-btn:hover { background: #0055CC; }
         .alert-btn:active { transform: scale(0.96); }
+
+        /* ===== 社区独立提示弹窗 ===== */
+        .community-notice-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 2100;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .community-notice-overlay.active { display: flex; }
+        .community-notice-card {
+            background: #fff;
+            border-radius: 20px;
+            max-width: 380px;
+            width: 100%;
+            padding: 32px 24px 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .community-notice-card .notice-icon {
+            font-size: 48px;
+            color: #007AFF;
+            margin-bottom: 12px;
+            display: block;
+        }
+        .community-notice-card .notice-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 8px;
+        }
+        .community-notice-card .notice-message {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 24px;
+            text-align: left;
+        }
+        .notice-btn-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        .notice-btn {
+            border: none;
+            border-radius: 12px;
+            padding: 10px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            min-width: 80px;
+        }
+        .notice-btn:active { transform: scale(0.96); }
+        .notice-btn.cancel {
+            background: #e5e5ea;
+            color: #555;
+        }
+        .notice-btn.cancel:hover { background: #d1d1d6; }
+        .notice-btn.go {
+            background: #007AFF;
+            color: #fff;
+        }
+        .notice-btn.go:hover { background: #0055CC; }
 
         /* ===== 图片预览弹窗 ===== */
         .image-overlay {
@@ -861,7 +1005,7 @@
             align-self: flex-end;
             background: none;
             border: none;
-            font-size: 28px;
+            font-size: 24px;
             color: #888;
             cursor: pointer;
             padding: 4px 8px;
@@ -870,6 +1014,27 @@
             line-height: 1;
         }
         .image-close:hover { color: #000; }
+
+        /* ===== 搜索无结果提示 ===== */
+        #search-no-result {
+            text-align: center;
+            padding: 20px 0;
+            color: #888;
+            font-size: 14px;
+            display: none;
+        }
+        #search-no-result .keyword {
+            color: #333;
+            font-weight: 600;
+        }
+        #search-no-result .clear-link {
+            color: #007AFF;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        #search-no-result .clear-link:hover {
+            text-decoration: underline;
+        }
 
         /* ===== 响应式 ===== */
         @media(max-width:600px) {
@@ -899,6 +1064,12 @@
             .image-card { padding: 12px; max-width: 95vw; }
             .image-close { font-size: 24px; }
             .image-card img { max-height: calc(90vh - 60px); }
+            .rank-tab { font-size: 13px; padding: 5px 14px; }
+            .app-update-time { font-size: 10px; }
+            .back-btn i { font-size: 16px; }
+            .community-notice-card { max-width: 320px; padding: 24px 16px 20px; }
+            .notice-btn { padding: 8px 16px; font-size: 14px; min-width: 60px; }
+            #search-no-result { font-size: 13px; padding: 16px 0; }
         }
     </style>
 </head>
@@ -910,7 +1081,7 @@
             <div class="header-content">
                 <h1 class="app-title">七七软件商城</h1>
                 <div class="search-bar">
-                    <span class="search-icon">🔍</span>
+                    <span class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
                     <input class="search-input" placeholder="搜索应用、游戏和更多" id="search-home" />
                 </div>
             </div>
@@ -922,7 +1093,11 @@
                 <h3 class="featured-title">七七视频解析</h3>
                 <p class="featured-desc">全网视频免费看，支持各大平台解析</p>
             </div>
-            <h2 class="section-title">热门排行</h2>
+            <h2 class="section-title">榜单</h2>
+            <div class="rank-tabs">
+                <span class="rank-tab active" data-mode="update" onclick="switchRankMode('update', this)"><i class="fa-solid fa-rotate"></i> 更新榜</span>
+                <span class="rank-tab" data-mode="hot" onclick="switchRankMode('hot', this)"><i class="fa-solid fa-fire"></i> 热门榜</span>
+            </div>
             <div class="app-list" id="home-app-list"></div>
         </div>
     </div>
@@ -933,7 +1108,7 @@
             <div class="header-content">
                 <h1 class="app-title">应用</h1>
                 <div class="search-bar">
-                    <span class="search-icon">🔍</span>
+                    <span class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
                     <input class="search-input" placeholder="搜索应用" id="search-apps" />
                 </div>
             </div>
@@ -949,6 +1124,11 @@
                 <div class="category-tab" onclick="filterCategory('online',this)">已上线</div>
             </div>
             <div class="app-list" id="all-apps-list"></div>
+            <!-- 搜索无结果提示 -->
+            <div id="search-no-result">
+                暂时没有关于“<span class="keyword" id="search-keyword-display"></span>”的软件<br>
+                <span class="clear-link" onclick="clearSearch()">全部软件</span>
+            </div>
         </div>
     </div>
 
@@ -956,7 +1136,7 @@
     <div class="page" id="page-app-detail">
         <div class="header">
             <div class="header-content">
-                <div class="back-btn" onclick="goBack()">返回</div>
+                <div class="back-btn" onclick="goBack()"><i class="fa-solid fa-chevron-left"></i> 返回</div>
                 <span class="sticky-title" id="sticky-title">应用名称</span>
                 <button class="visit-btn online sticky-visit-btn" id="sticky-visit-btn">访问</button>
             </div>
@@ -999,11 +1179,11 @@
                 <div class="dev-info">
                     <div class="dev-name-row">
                         <span class="dev-name" id="detail-dev-name">开发者名称</span>
-                        <span class="verified-badge badge-gold" id="detail-dev-badge" title="网站站主专属">✓</span>
+                        <span class="verified-badge badge-gold" id="detail-dev-badge" title="网站站主专属"><i class="fa-solid fa-check"></i></span>
                     </div>
                     <div class="dev-desc" id="detail-dev-desc">开发者简介</div>
                 </div>
-                <div class="dev-arrow">›</div>
+                <div class="dev-arrow"><i class="fa-solid fa-chevron-right"></i></div>
             </div>
 
             <div id="collaborator-section" style="display:none;">
@@ -1027,7 +1207,7 @@
     <div class="page" id="page-developer">
         <div class="header">
             <div class="header-content">
-                <div class="back-btn" onclick="goBack()">返回</div>
+                <div class="back-btn" onclick="goBack()"><i class="fa-solid fa-chevron-left"></i> 返回</div>
             </div>
         </div>
         <div class="container">
@@ -1035,8 +1215,8 @@
                 <div class="developer-avatar" id="dev-avatar"><img src="" alt="开发者头像" /></div>
                 <div class="developer-name-row">
                     <span class="developer-name" id="dev-name">开发者名称</span>
-                    <span class="verified-badge badge-gold" id="dev-badge" title="网站站主专属">✓</span>
-                    <span class="dev-rating-downloads" id="dev-rating-downloads">★ 4.8 · 下载量50万+</span>
+                    <span class="verified-badge badge-gold" id="dev-badge" title="网站站主专属"><i class="fa-solid fa-check"></i></span>
+                    <span class="dev-rating-downloads" id="dev-rating-downloads"><i class="fa-solid fa-star" style="color:#FFB800;"></i> 4.8 · 下载量50万+</span>
                 </div>
                 <div class="developer-desc" id="dev-desc">开发者简介</div>
             </div>
@@ -1052,13 +1232,13 @@
         </div>
     </div>
 
-    <!-- ==================== 社区 ==================== -->
+    <!-- ==================== 社区页面（保留但不再切换） ==================== -->
     <div class="page" id="page-community">
         <div class="header">
             <div class="header-content">
                 <h1 class="app-title">社区</h1>
                 <div class="search-bar">
-                    <span class="search-icon">🔍</span>
+                    <span class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
                     <input class="search-input" placeholder="搜索动态" id="search-community" />
                 </div>
             </div>
@@ -1089,10 +1269,10 @@
     <!-- ==================== 底部导航 ==================== -->
     <div class="bottom-nav" id="bottomNav">
         <div class="bottom-nav-content">
-            <div class="nav-item active" onclick="switchTab('home')"><span class="nav-icon">🏠</span><span>首页</span></div>
-            <div class="nav-item" onclick="switchTab('apps')"><span class="nav-icon">📱</span><span>应用</span></div>
-            <div class="nav-item" onclick="switchTab('community')"><span class="nav-icon">💬</span><span>社区</span></div>
-            <div class="nav-item" onclick="switchTab('mine')"><span class="nav-icon">👤</span><span>创作者</span></div>
+            <div class="nav-item active" onclick="switchTab('home')"><span class="nav-icon"><i class="fa-solid fa-house"></i></span><span>首页</span></div>
+            <div class="nav-item" onclick="switchTab('apps')"><span class="nav-icon"><i class="fa-solid fa-mobile-screen-button"></i></span><span>应用</span></div>
+            <div class="nav-item" onclick="showCommunityNotice()"><span class="nav-icon"><i class="fa-regular fa-comment"></i></span><span>社区</span></div>
+            <div class="nav-item" onclick="switchTab('mine')"><span class="nav-icon"><i class="fa-regular fa-user"></i></span><span>创作者</span></div>
         </div>
     </div>
 
@@ -1101,7 +1281,7 @@
         <div class="modal-card">
             <div class="modal-header">
                 <h3>全部更新日志</h3>
-                <button class="modal-close" id="modal-close-btn">&times;</button>
+                <button class="modal-close" id="modal-close-btn"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div id="modal-update-list"></div>
         </div>
@@ -1109,24 +1289,41 @@
 
     <div class="alert-overlay" id="alert-overlay">
         <div class="alert-card">
-            <span class="alert-icon">🔔</span>
+            <span class="alert-icon"><i class="fa-regular fa-circle-check"></i></span>
             <div class="alert-title">提示</div>
             <div class="alert-message" id="alert-message">该应用暂无外部链接</div>
             <button class="alert-btn" id="alert-btn">我知道了</button>
         </div>
     </div>
 
+    <!-- ===== 社区独立提示弹窗 ===== -->
+    <div class="community-notice-overlay" id="community-notice">
+        <div class="community-notice-card">
+            <span class="notice-icon"><i class="fa-regular fa-comment-dots"></i></span>
+            <div class="notice-title">社区功能已迁移</div>
+            <div class="notice-message">
+                由于业务调整，原「社区」板块已独立为单独的网站 —— <strong>Seven戚的频道</strong>。<br /><br />
+                您可以在新网站自由发帖，或反馈使用过程中遇到的任何问题，我们会在那里持续与您互动。
+            </div>
+            <div class="notice-btn-group">
+                <button class="notice-btn cancel" onclick="closeCommunityNotice()">稍后</button>
+                <button class="notice-btn go" onclick="goToCommunitySite()">前往</button>
+            </div>
+        </div>
+    </div>
+
     <div class="image-overlay" id="image-overlay" onclick="closeImagePreview()">
         <div class="image-card" onclick="event.stopPropagation();">
-            <button class="image-close" onclick="closeImagePreview()">✕</button>
+            <button class="image-close" onclick="closeImagePreview()"><i class="fa-solid fa-xmark"></i></button>
             <img id="preview-image" src="" alt="图片预览" />
         </div>
     </div>
 
     <!-- ===== 引用数据文件（软件.js） ===== -->
-    <script src="软件.js"></script>
+    <script src="软件.js">
+    </script>
 
-    <!-- ===== 交互逻辑（内联） ===== -->
+    <!-- ===== 交互逻辑 ===== -->
     <script>
         (function() {
             // ---------- 确保数据已加载 ----------
@@ -1138,11 +1335,43 @@
             // ---------- 页面状态 ----------
             let currentPage = 'home';
             let pageStack = ['home'];
+            let homeSortMode = 'update';
 
             // ---------- 工具函数 ----------
             function getAppById(id) { return APPS[id]; }
             function getDeveloperById(id) { return DEVELOPERS[id]; }
             function getAllApps() { return Object.values(APPS); }
+
+            function getLatestUpdateDate(app) {
+                if (!app.updates || app.updates.length === 0) return null;
+                let latest = null;
+                for (const update of app.updates) {
+                    if (update.date) {
+                        if (!latest || update.date > latest) {
+                            latest = update.date;
+                        }
+                    }
+                }
+                return latest;
+            }
+
+            function formatUpdateDate(dateStr) {
+                if (!dateStr) return '';
+                if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+                    return dateStr;
+                }
+                return dateStr;
+            }
+
+            function parseDownloads(str) {
+                if (!str) return 0;
+                let s = str.replace(/[+,]/g, '');
+                if (s.includes('万')) {
+                    const num = parseFloat(s.replace('万', ''));
+                    return num * 10000;
+                }
+                return parseFloat(s) || 0;
+            }
 
             function getDeveloperApps(devId) {
                 const apps = getAllApps();
@@ -1151,8 +1380,46 @@
                 return { owned, assist };
             }
 
+            // ---------- 搜索过滤逻辑 ----------
+            function filterAppList(keyword) {
+                const container = document.getElementById('all-apps-list');
+                if (!container) return;
+                const items = container.querySelectorAll('.app-list-item');
+                let visibleCount = 0;
+                const lowerKeyword = keyword.trim().toLowerCase();
+                items.forEach(item => {
+                    const name = item.querySelector('.app-name')?.textContent?.toLowerCase() || '';
+                    const desc = item.querySelector('.app-desc')?.textContent?.toLowerCase() || '';
+                    const match = name.includes(lowerKeyword) || desc.includes(lowerKeyword);
+                    item.style.display = match ? '' : 'none';
+                    if (match) visibleCount++;
+                });
+
+                const noResult = document.getElementById('search-no-result');
+                if (lowerKeyword && visibleCount === 0) {
+                    noResult.style.display = 'block';
+                    document.getElementById('search-keyword-display').textContent = lowerKeyword;
+                } else {
+                    noResult.style.display = 'none';
+                }
+            }
+
+            // ---------- 清除搜索 ----------
+            window.clearSearch = function() {
+                const homeSearch = document.getElementById('search-home');
+                const appsSearch = document.getElementById('search-apps');
+                if (homeSearch) homeSearch.value = '';
+                if (appsSearch) appsSearch.value = '';
+                filterAppList('');
+                // 同时恢复所有应用显示（如果分类筛选已生效，filterAppList会保留分类过滤，但会显示所有匹配项，因关键词为空所以全部显示）
+            };
+
             // ---------- 页面切换 ----------
             function showPage(pageId) {
+                if (pageId === 'community') {
+                    showCommunityNotice();
+                    return;
+                }
                 document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
                 const target = document.getElementById('page-' + pageId);
                 if (target) target.classList.add('active');
@@ -1174,11 +1441,14 @@
             }
 
             window.switchTab = function(tab) {
-                if (tab === 'home' || tab === 'apps' || tab === 'community' || tab === 'mine') {
+                if (tab === 'community') {
+                    showCommunityNotice();
+                    return;
+                }
+                if (tab === 'home' || tab === 'apps' || tab === 'mine') {
                     showPage(tab);
                     if (tab === 'home') renderHome();
                     else if (tab === 'apps') renderApps('all');
-                    else if (tab === 'community') renderCommunity('all');
                     else if (tab === 'mine') renderCreators();
                 }
             };
@@ -1187,10 +1457,13 @@
                 if (pageStack.length > 1) {
                     pageStack.pop();
                     const prev = pageStack[pageStack.length - 1];
+                    if (prev === 'community') {
+                        showCommunityNotice();
+                        return;
+                    }
                     showPage(prev);
                     if (prev === 'home') renderHome();
                     else if (prev === 'apps') renderApps('all');
-                    else if (prev === 'community') renderCommunity('all');
                     else if (prev === 'mine') renderCreators();
                 } else {
                     showPage('home');
@@ -1198,44 +1471,71 @@
                 }
             };
 
-            // ---------- 渲染首页（只显示已上架，按下载量降序） ----------
+            // ---------- 社区独立弹窗 ----------
+            window.showCommunityNotice = function() {
+                document.getElementById('community-notice').classList.add('active');
+            };
+            window.closeCommunityNotice = function() {
+                document.getElementById('community-notice').classList.remove('active');
+            };
+            window.goToCommunitySite = function() {
+                window.open('https://sevenseven712.github.io/liuyanban/', '_blank');
+                closeCommunityNotice();
+            };
+            document.getElementById('community-notice').addEventListener('click', function(e) {
+                if (e.target === this) closeCommunityNotice();
+            });
+
+            // ---------- 榜单切换 ----------
+            window.switchRankMode = function(mode, el) {
+                homeSortMode = mode;
+                document.querySelectorAll('.rank-tab').forEach(tab => tab.classList.remove('active'));
+                if (el) el.classList.add('active');
+                renderHome();
+            };
+
+            // ---------- 渲染首页 ----------
             function renderHome() {
                 const container = document.getElementById('home-app-list');
+                let apps = getAllApps().filter(app => app.status === 'online');
 
-                // 工具：将下载量字符串转为数值（单位：次）
-                function parseDownloads(str) {
-                    if (!str) return 0;
-                    let s = str.replace(/[+,]/g, '');          // 去除 + 和逗号
-                    if (s.includes('万')) {
-                        const num = parseFloat(s.replace('万', ''));
-                        return num * 10000;
-                    }
-                    return parseFloat(s) || 0;
+                if (homeSortMode === 'update') {
+                    apps.sort((a, b) => {
+                        const dateA = getLatestUpdateDate(a);
+                        const dateB = getLatestUpdateDate(b);
+                        if (dateA && !dateB) return -1;
+                        if (!dateA && dateB) return 1;
+                        if (!dateA && !dateB) return 0;
+                        if (dateA > dateB) return -1;
+                        if (dateA < dateB) return 1;
+                        return 0;
+                    });
+                } else {
+                    apps.sort((a, b) => parseDownloads(b.downloads) - parseDownloads(a.downloads));
                 }
-
-                const apps = getAllApps()
-                    .filter(app => app.status === 'online')
-                    .sort((a, b) => parseDownloads(b.downloads) - parseDownloads(a.downloads)); // 下载量降序
 
                 container.innerHTML = apps.map((app, index) => {
                     const rankClass = index === 0 ? 'top-1' : index === 1 ? 'top-2' : index === 2 ? 'top-3' : '';
+                    const latestDate = getLatestUpdateDate(app);
+                    const updateDisplay = latestDate ? `更新于 ${formatUpdateDate(latestDate)}` : '';
                     return `
-                        <div class="app-list-item" onclick="goToAppDetail('${app.id}')">
-                            <div class="rank-number ${rankClass}">${index + 1}</div>
-                            <div class="app-icon"><img src="${app.iconUrl}" alt="${app.name}" onerror="this.style.display='none'"/></div>
-                            <div class="app-info">
-                                <div class="app-name-row">
-                                    <span class="app-name">${app.name}</span>
-                                    <span class="app-rating-downloads">★ ${app.rating} · ${app.downloads}</span>
+                            <div class="app-list-item" onclick="goToAppDetail('${app.id}')">
+                                <div class="rank-number ${rankClass}">${index + 1}</div>
+                                <div class="app-icon"><img src="${app.iconUrl}" alt="${app.name}" onerror="this.style.display='none'"/></div>
+                                <div class="app-info">
+                                    <div class="app-name-row">
+                                        <span class="app-name">${app.name}</span>
+                                        <span class="app-rating-downloads"><i class="fa-solid fa-star"></i> ${app.rating} · ${app.downloads}</span>
+                                    </div>
+                                    <div class="app-author-row">
+                                        <span class="app-author-name" onclick="event.stopPropagation();goToDeveloper('${app.developerId}')">${app.developer}</span>
+                                    </div>
+                                    <div class="app-desc">${app.shortDesc}</div>
+                                    ${updateDisplay ? `<div class="app-update-time"><i class="fa-solid fa-rotate"></i> <span class="update-date">${updateDisplay}</span></div>` : ''}
                                 </div>
-                                <div class="app-author-row">
-                                    <span class="app-author-name" onclick="event.stopPropagation();goToDeveloper('${app.developerId}')">${app.developer}</span>
-                                </div>
-                                <div class="app-desc">${app.shortDesc}</div>
+                                <button class="visit-btn online" onclick="event.stopPropagation();visitApp('${app.id}')">访问</button>
                             </div>
-                            <button class="visit-btn online" onclick="event.stopPropagation();visitApp('${app.id}')">访问</button>
-                        </div>
-                    `;
+                        `;
                 }).join('');
             }
 
@@ -1259,25 +1559,34 @@
                 apps.sort((a, b) => (a.rank || 999) - (b.rank || 999));
                 container.innerHTML = apps.map(app => {
                     const statusClass = app.status === 'online' ? 'online' : (app.status === 'beta' ? 'beta' : 'error');
+                    const latestDate = getLatestUpdateDate(app);
+                    const updateDisplay = latestDate ? `更新于 ${formatUpdateDate(latestDate)}` : '';
                     return `
-                        <div class="app-list-item" onclick="goToAppDetail('${app.id}')">
-                            <div class="app-icon"><img src="${app.iconUrl}" alt="${app.name}" onerror="this.style.display='none'"/></div>
-                            <div class="app-info">
-                                <div class="app-name-row">
-                                    <span class="app-name">${app.name}</span>
-                                    <span class="app-rating-downloads">★ ${app.rating} · ${app.downloads}</span>
+                            <div class="app-list-item" onclick="goToAppDetail('${app.id}')">
+                                <div class="app-icon"><img src="${app.iconUrl}" alt="${app.name}" onerror="this.style.display='none'"/></div>
+                                <div class="app-info">
+                                    <div class="app-name-row">
+                                        <span class="app-name">${app.name}</span>
+                                        <span class="app-rating-downloads"><i class="fa-solid fa-star"></i> ${app.rating} · ${app.downloads}</span>
+                                    </div>
+                                    <div class="app-author-row">
+                                        <span class="app-author-name" onclick="event.stopPropagation();goToDeveloper('${app.developerId}')">${app.developer}</span>
+                                    </div>
+                                    <div class="app-desc">${app.shortDesc}</div>
+                                    ${updateDisplay ? `<div class="app-update-time"><i class="fa-solid fa-rotate"></i> <span class="update-date">${updateDisplay}</span></div>` : ''}
                                 </div>
-                                <div class="app-author-row">
-                                    <span class="app-author-name" onclick="event.stopPropagation();goToDeveloper('${app.developerId}')">${app.developer}</span>
-                                </div>
-                                <div class="app-desc">${app.shortDesc}</div>
+                                <button class="visit-btn ${statusClass}" onclick="event.stopPropagation();visitApp('${app.id}')">
+                                    ${app.status === 'online' ? '访问' : (app.status === 'beta' ? '内测' : '下架')}
+                                </button>
                             </div>
-                            <button class="visit-btn ${statusClass}" onclick="event.stopPropagation();visitApp('${app.id}')">
-                                ${app.status === 'online' ? '访问' : (app.status === 'beta' ? '内测' : '下架')}
-                            </button>
-                        </div>
-                    `;
+                        `;
                 }).join('');
+
+                // 渲染后应用当前搜索过滤
+                const searchInput = document.getElementById('search-apps');
+                if (searchInput) {
+                    filterAppList(searchInput.value);
+                }
             }
 
             // ---------- 应用详情 ----------
@@ -1303,8 +1612,11 @@
                 const banner = document.getElementById('status-banner');
                 if (app.notice) {
                     banner.style.display = 'flex';
-                    const icon = app.status === 'online' ? '✅' : (app.status === 'beta' ? '⚠️' : '🚫');
-                    document.getElementById('status-banner-icon').textContent = icon;
+                    let iconHtml = '';
+                    if (app.status === 'online') iconHtml = '<i class="fa-regular fa-circle-check" style="color:#2e7d32;"></i>';
+                    else if (app.status === 'beta') iconHtml = '<i class="fa-solid fa-triangle-exclamation" style="color:#e65100;"></i>';
+                    else iconHtml = '<i class="fa-solid fa-ban" style="color:#c62828;"></i>';
+                    document.getElementById('status-banner-icon').innerHTML = iconHtml;
                     document.getElementById('status-banner-text').textContent = app.notice;
                     banner.style.backgroundColor = app.status === 'online' ? '#e8f5e9' : (app.status === 'beta' ? '#fff3e0' : '#ffebee');
                 } else {
@@ -1314,10 +1626,10 @@
                 const scContainer = document.getElementById('screenshots-container');
                 if (app.screenshots && app.screenshots.length) {
                     scContainer.innerHTML = app.screenshots.map(url => `
-                        <div class="screenshot" onclick="previewImage('${url}')">
-                            <img src="${url}" alt="截图" onerror="this.style.display='none'"/>
-                        </div>
-                    `).join('');
+                            <div class="screenshot" onclick="previewImage('${url}')">
+                                <img src="${url}" alt="截图" onerror="this.style.display='none'"/>
+                            </div>
+                        `).join('');
                 } else {
                     scContainer.innerHTML = '<div style="color:#888;padding:10px 0;">暂无截图</div>';
                 }
@@ -1327,14 +1639,14 @@
                 const showUpdates = updates.slice(0, 3);
                 if (showUpdates.length) {
                     updateLog.innerHTML = showUpdates.map(u => `
-                        <div class="update-item">
-                            <div class="update-version">
-                                <span>${u.version}</span>
-                                <span class="update-date">${u.date}</span>
+                            <div class="update-item">
+                                <div class="update-version">
+                                    <span>${u.version}</span>
+                                    <span class="update-date">${u.date}</span>
+                                </div>
+                                <div class="update-content">${u.content}</div>
                             </div>
-                            <div class="update-content">${u.content}</div>
-                        </div>
-                    `).join('');
+                        `).join('');
                 } else {
                     updateLog.innerHTML = '<div style="padding:12px 0;color:#888;">暂无更新记录</div>';
                 }
@@ -1352,7 +1664,7 @@
                     if (dev.badge) {
                         badge.className = `verified-badge badge-${dev.badge}`;
                         badge.style.display = 'inline-flex';
-                        badge.textContent = '✓';
+                        badge.innerHTML = '<i class="fa-solid fa-check"></i>';
                     } else {
                         badge.style.display = 'none';
                     }
@@ -1367,14 +1679,14 @@
                         const cDev = getDeveloperById(c.id);
                         const avatarUrl = cDev ? cDev.avatarUrl : '';
                         return `
-                            <div class="collaborator-item" onclick="goToDeveloper('${c.id}')">
-                                <div class="collaborator-avatar"><img src="${avatarUrl}" alt="${c.name}" onerror="this.style.display='none'"/></div>
-                                <div class="collaborator-info">
-                                    ${c.name}
-                                    <span class="collaborator-role">${c.role}</span>
+                                <div class="collaborator-item" onclick="goToDeveloper('${c.id}')">
+                                    <div class="collaborator-avatar"><img src="${avatarUrl}" alt="${c.name}" onerror="this.style.display='none'"/></div>
+                                    <div class="collaborator-info">
+                                        ${c.name}
+                                        <span class="collaborator-role">${c.role}</span>
+                                    </div>
                                 </div>
-                            </div>
-                        `;
+                            `;
                     }).join('');
                 } else {
                     collabSection.style.display = 'none';
@@ -1408,14 +1720,14 @@
                 const updates = app.updates || [];
                 if (updates.length) {
                     list.innerHTML = updates.map(u => `
-                        <div class="modal-update-item">
-                            <div class="modal-update-version">
-                                <span>${u.version}</span>
-                                <span class="modal-update-date">${u.date}</span>
+                            <div class="modal-update-item">
+                                <div class="modal-update-version">
+                                    <span>${u.version}</span>
+                                    <span class="modal-update-date">${u.date}</span>
+                                </div>
+                                <div class="modal-update-content">${u.content}</div>
                             </div>
-                            <div class="modal-update-content">${u.content}</div>
-                        </div>
-                    `).join('');
+                        `).join('');
                 } else {
                     list.innerHTML = '<div style="padding:12px 0;color:#888;">暂无更新记录</div>';
                 }
@@ -1475,7 +1787,7 @@
                 if (dev.badge) {
                     badge.className = `verified-badge badge-${dev.badge}`;
                     badge.style.display = 'inline-flex';
-                    badge.textContent = '✓';
+                    badge.innerHTML = '<i class="fa-solid fa-check"></i>';
                 } else {
                     badge.style.display = 'none';
                 }
@@ -1485,13 +1797,13 @@
                 let totalDownloads = 0;
                 let totalRating = 0;
                 allApps.forEach(a => {
-                    const num = parseFloat(a.downloads.replace(/[万,]/g, ''));
+                    const num = parseDownloads(a.downloads);
                     if (!isNaN(num)) totalDownloads += num;
                     totalRating += parseFloat(a.rating) || 0;
                 });
                 const avgRating = allApps.length ? (totalRating / allApps.length).toFixed(1) : '0';
-                const downloadStr = totalDownloads > 10000 ? (totalDownloads/10000).toFixed(1)+'万' : totalDownloads+'';
-                document.getElementById('dev-rating-downloads').textContent = `★ ${avgRating} · 下载量${downloadStr}+`;
+                const downloadStr = totalDownloads > 10000 ? (totalDownloads / 10000).toFixed(1) + '万' : totalDownloads + '';
+                document.getElementById('dev-rating-downloads').innerHTML = `<i class="fa-solid fa-star" style="color:#FFB800;"></i> ${avgRating} · 下载量${downloadStr}+`;
                 document.getElementById('dev-app-count').textContent = allApps.length;
 
                 const ownedContainer = document.getElementById('dev-owned-apps');
@@ -1516,25 +1828,28 @@
             function renderAppListItems(apps) {
                 return apps.map(app => {
                     const statusClass = app.status === 'online' ? 'online' : (app.status === 'beta' ? 'beta' : 'error');
+                    const latestDate = getLatestUpdateDate(app);
+                    const updateDisplay = latestDate ? `更新于 ${formatUpdateDate(latestDate)}` : '';
                     return `
-                        <div class="app-list-item" onclick="goToAppDetail('${app.id}')">
-                            <div class="app-icon"><img src="${app.iconUrl}" alt="${app.name}" onerror="this.style.display='none'"/></div>
-                            <div class="app-info">
-                                <div class="app-name-row">
-                                    <span class="app-name">${app.name}</span>
-                                    <span class="app-rating-downloads">★ ${app.rating} · ${app.downloads}</span>
+                            <div class="app-list-item" onclick="goToAppDetail('${app.id}')">
+                                <div class="app-icon"><img src="${app.iconUrl}" alt="${app.name}" onerror="this.style.display='none'"/></div>
+                                <div class="app-info">
+                                    <div class="app-name-row">
+                                        <span class="app-name">${app.name}</span>
+                                        <span class="app-rating-downloads"><i class="fa-solid fa-star"></i> ${app.rating} · ${app.downloads}</span>
+                                    </div>
+                                    <div class="app-desc">${app.shortDesc}</div>
+                                    ${updateDisplay ? `<div class="app-update-time"><i class="fa-solid fa-rotate"></i> <span class="update-date">${updateDisplay}</span></div>` : ''}
                                 </div>
-                                <div class="app-desc">${app.shortDesc}</div>
+                                <button class="visit-btn ${statusClass}" onclick="event.stopPropagation();visitApp('${app.id}')">
+                                    ${app.status === 'online' ? '访问' : (app.status === 'beta' ? '内测' : '下架')}
+                                </button>
                             </div>
-                            <button class="visit-btn ${statusClass}" onclick="event.stopPropagation();visitApp('${app.id}')">
-                                ${app.status === 'online' ? '访问' : (app.status === 'beta' ? '内测' : '下架')}
-                            </button>
-                        </div>
-                    `;
+                        `;
                 }).join('');
             }
 
-            // ---------- 社区 ----------
+            // ---------- 社区（内部函数，但不再被切换调用） ----------
             let communityFilter = 'all';
             window.switchCommunityTab = function(type, el) {
                 communityFilter = type;
@@ -1550,26 +1865,26 @@
                     posts = posts.filter(p => p.type === type);
                 }
                 container.innerHTML = posts.map(post => `
-                    <div class="post-card ${post.type === 'official' ? 'official' : ''}">
-                        <div class="post-header">
-                            <div class="post-avatar"><img src="${post.avatarUrl}" alt="${post.username}" onerror="this.style.display='none'"/></div>
-                            <div>
-                                <div class="post-user-row">
-                                    <span class="post-username ${post.type === 'official' ? 'username-official' : ''}">${post.username}</span>
-                                    <span class="verified-badge badge-${post.badge || 'gray'}">✓</span>
-                                    <span class="post-time">${post.time}</span>
+                        <div class="post-card ${post.type === 'official' ? 'official' : ''}">
+                            <div class="post-header">
+                                <div class="post-avatar"><img src="${post.avatarUrl}" alt="${post.username}" onerror="this.style.display='none'"/></div>
+                                <div>
+                                    <div class="post-user-row">
+                                        <span class="post-username ${post.type === 'official' ? 'username-official' : ''}">${post.username}</span>
+                                        <span class="verified-badge badge-${post.badge || 'gray'}"><i class="fa-solid fa-check"></i></span>
+                                        <span class="post-time">${post.time}</span>
+                                    </div>
+                                    ${post.badgeText ? `<span style="font-size:12px;color:#888;">${post.badgeText}</span>` : ''}
                                 </div>
-                                ${post.badgeText ? `<span style="font-size:12px;color:#888;">${post.badgeText}</span>` : ''}
+                            </div>
+                            <div class="post-content">${post.content}</div>
+                            <div class="post-actions">
+                                <span class="post-action"><i class="fa-regular fa-heart"></i> ${post.likes}</span>
+                                <span class="post-action"><i class="fa-regular fa-comment"></i> ${post.comments}</span>
+                                <span class="post-action"><i class="fa-solid fa-arrow-up-right-from-square"></i> ${post.shares}</span>
                             </div>
                         </div>
-                        <div class="post-content">${post.content}</div>
-                        <div class="post-actions">
-                            <span class="post-action">❤️ ${post.likes}</span>
-                            <span class="post-action">💬 ${post.comments}</span>
-                            <span class="post-action">↗️ ${post.shares}</span>
-                        </div>
-                    </div>
-                `).join('');
+                    `).join('');
             }
 
             // ---------- 创作者列表 ----------
@@ -1577,21 +1892,21 @@
                 const container = document.getElementById('creator-list');
                 const devs = Object.values(DEVELOPERS);
                 container.innerHTML = devs.map(dev => `
-                    <div class="creator-item" onclick="goToDeveloper('${dev.id}')">
-                        <div class="creator-avatar"><img src="${dev.avatarUrl}" alt="${dev.name}" onerror="this.style.display='none'"/></div>
-                        <div class="creator-info">
-                            <div class="creator-name-row">
-                                <span class="creator-name">${dev.name}</span>
-                                ${dev.badge ? `<span class="verified-badge badge-${dev.badge}">✓</span>` : ''}
+                        <div class="creator-item" onclick="goToDeveloper('${dev.id}')">
+                            <div class="creator-avatar"><img src="${dev.avatarUrl}" alt="${dev.name}" onerror="this.style.display='none'"/></div>
+                            <div class="creator-info">
+                                <div class="creator-name-row">
+                                    <span class="creator-name">${dev.name}</span>
+                                    ${dev.badge ? `<span class="verified-badge badge-${dev.badge}"><i class="fa-solid fa-check"></i></span>` : ''}
+                                </div>
+                                <div class="creator-desc">${dev.description || ''}</div>
                             </div>
-                            <div class="creator-desc">${dev.description || ''}</div>
+                            <div class="creator-arrow"><i class="fa-solid fa-chevron-right"></i></div>
                         </div>
-                        <div class="creator-arrow">›</div>
-                    </div>
-                `).join('');
+                    `).join('');
             }
 
-            // ---------- 搜索功能 ----------
+            // ---------- 搜索功能绑定 ----------
             function setupSearch(inputId, callback) {
                 const input = document.getElementById(inputId);
                 if (!input) return;
@@ -1600,28 +1915,35 @@
                     callback(keyword);
                 });
             }
+
+            // 应用页搜索
+            setupSearch('search-apps', function(keyword) {
+                filterAppList(keyword);
+            });
+
+            // 首页搜索：切换至应用页并同步搜索词
             setupSearch('search-home', function(keyword) {
                 if (keyword) {
+                    // 切换到应用页
                     switchTab('apps');
-                    setTimeout(() => {
-                        const items = document.querySelectorAll('#all-apps-list .app-list-item');
-                        items.forEach(item => {
-                            const name = item.querySelector('.app-name')?.textContent?.toLowerCase() || '';
-                            const desc = item.querySelector('.app-desc')?.textContent?.toLowerCase() || '';
-                            item.style.display = (name.includes(keyword) || desc.includes(keyword)) ? '' : 'none';
-                        });
-                    }, 100);
+                    // 同步应用页搜索框
+                    const appsInput = document.getElementById('search-apps');
+                    if (appsInput) {
+                        appsInput.value = keyword;
+                        filterAppList(keyword);
+                    }
                 } else {
-                    document.querySelectorAll('#all-apps-list .app-list-item').forEach(item => item.style.display = '');
+                    // 如果清空，也切换到应用页并清空
+                    switchTab('apps');
+                    const appsInput = document.getElementById('search-apps');
+                    if (appsInput) {
+                        appsInput.value = '';
+                        filterAppList('');
+                    }
                 }
             });
-            setupSearch('search-apps', function(keyword) {
-                document.querySelectorAll('#all-apps-list .app-list-item').forEach(item => {
-                    const name = item.querySelector('.app-name')?.textContent?.toLowerCase() || '';
-                    const desc = item.querySelector('.app-desc')?.textContent?.toLowerCase() || '';
-                    item.style.display = (name.includes(keyword) || desc.includes(keyword)) ? '' : 'none';
-                });
-            });
+
+            // 社区搜索保持原有逻辑（不干扰应用搜索）
             setupSearch('search-community', function(keyword) {
                 document.querySelectorAll('#post-list .post-card').forEach(post => {
                     const content = post.querySelector('.post-content')?.textContent?.toLowerCase() || '';
@@ -1630,18 +1952,24 @@
             });
 
             // ---------- 初始化 ----------
+            homeSortMode = 'update';
+            document.querySelectorAll('.rank-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.mode === 'update');
+            });
+
             renderHome();
             renderApps('all');
             renderCommunity('all');
             renderCreators();
             showPage('home');
 
-            // 暴露全局（供 onclick 使用）
             window.renderHome = renderHome;
             window.renderApps = renderApps;
             window.renderCommunity = renderCommunity;
             window.renderCreators = renderCreators;
             window.showAllUpdates = showAllUpdates;
+            window.getLatestUpdateDate = getLatestUpdateDate;
+            window.filterAppList = filterAppList; // 暴露用于调试
         })();
     </script>
 
