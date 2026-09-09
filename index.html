@@ -1082,7 +1082,7 @@
                 <h1 class="app-title">七七软件商城</h1>
                 <div class="search-bar">
                     <span class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
-                    <input class="search-input" placeholder="搜索应用、游戏和更多" id="search-home" />
+                    <input class="search-input" placeholder="搜索应用" id="search-home" />
                 </div>
             </div>
         </div>
@@ -1239,7 +1239,7 @@
                 <h1 class="app-title">社区</h1>
                 <div class="search-bar">
                     <span class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
-                    <input class="search-input" placeholder="搜索动态" id="search-community" />
+                    <input class="search-input" placeholder="搜索应用" id="search-community" />
                 </div>
             </div>
         </div>
@@ -1411,7 +1411,6 @@
                 if (homeSearch) homeSearch.value = '';
                 if (appsSearch) appsSearch.value = '';
                 filterAppList('');
-                // 同时恢复所有应用显示（如果分类筛选已生效，filterAppList会保留分类过滤，但会显示所有匹配项，因关键词为空所以全部显示）
             };
 
             // ---------- 页面切换 ----------
@@ -1924,16 +1923,13 @@
             // 首页搜索：切换至应用页并同步搜索词
             setupSearch('search-home', function(keyword) {
                 if (keyword) {
-                    // 切换到应用页
                     switchTab('apps');
-                    // 同步应用页搜索框
                     const appsInput = document.getElementById('search-apps');
                     if (appsInput) {
                         appsInput.value = keyword;
                         filterAppList(keyword);
                     }
                 } else {
-                    // 如果清空，也切换到应用页并清空
                     switchTab('apps');
                     const appsInput = document.getElementById('search-apps');
                     if (appsInput) {
@@ -1943,7 +1939,7 @@
                 }
             });
 
-            // 社区搜索保持原有逻辑（不干扰应用搜索）
+            // 社区搜索（保留但独立）
             setupSearch('search-community', function(keyword) {
                 document.querySelectorAll('#post-list .post-card').forEach(post => {
                     const content = post.querySelector('.post-content')?.textContent?.toLowerCase() || '';
@@ -1969,7 +1965,7 @@
             window.renderCreators = renderCreators;
             window.showAllUpdates = showAllUpdates;
             window.getLatestUpdateDate = getLatestUpdateDate;
-            window.filterAppList = filterAppList; // 暴露用于调试
+            window.filterAppList = filterAppList;
         })();
     </script>
 
