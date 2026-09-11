@@ -94,6 +94,7 @@ const APPS = {
         description: "Seven戚频道是一个由Seven戚个人开发的聊天交流网站，同时也是他第一次将后端编程运用到自己的网站中运营。",
         notice: "",
         updates: [
+            { version: "v1.2.0", date: "2026-09-11", content: "更新的底部导航栏图标为SVG" },
             { version: "v1.1.0", date: "2026-08-30", content: "1.点击顶部个人头像进入“个人”页面\n2.群聊未读消息红点显示\n3.底部导航栏和顶部导航栏兼容为js文件\n4.帖子发布支持富文本" },
             { version: "v1.0.0", date: "2026-08-27", content: "发布网站" },
         ],
@@ -570,7 +571,7 @@ const APPS = {
         description: "Seven戚的个人博客支持多端互通，不过电脑端浏览效果最佳哦",
         notice: "",
         updates: [
-            { version: "v1.1.0", date: "2026-09-11", content: "更新了联系方式\n·QQ群\n·软件商城\n·帖子网站（Seven戚的频道）" }
+            { version: "v1.1.0", date: "2026-09-11", content: "更新了联系方式\n·QQ群\n·软件商城\n·帖子网站（Seven戚的频道）" },
             { version: "v1.0.0", date: "2026-07-02", content: "本网站正式展示" }
         ],
         screenshots: [
