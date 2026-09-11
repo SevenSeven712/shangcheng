@@ -570,6 +570,7 @@ const APPS = {
         description: "Seven戚的个人博客支持多端互通，不过电脑端浏览效果最佳哦",
         notice: "",
         updates: [
+            { version: "v1.1.0", date: "2026-09-11", content: "更新了联系方式\n·QQ群\n·软件商城\n·帖子网站（Seven戚的频道）" }
             { version: "v1.0.0", date: "2026-07-02", content: "本网站正式展示" }
         ],
         screenshots: [
