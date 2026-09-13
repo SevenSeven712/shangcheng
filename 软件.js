@@ -73,6 +73,38 @@ const APPS = {
             { id: "deep", name: "Deepseek", role: "网站框架" },
         ]
     },
+    WNL: {
+        id: "WNL",
+        name: "小七万年历",
+        icon: "??",
+        iconUrl: "<a href="https://i.ibb.co/1YSSvY8Q/QQ-20260913180715.png",
+        developerId: "sevenqi",
+        developer: "Seven戚",
+        category: "tools",
+        categoryName: "工具",
+        status: "online",
+        statusText: "已上线",
+        rank: 1,
+        rating: 4.9,
+        downloads: "8.3万",
+        version: "1.0.0",
+        views: 22500,
+        website: "https://sevenseven712.github.io/long years/",
+        shortDesc: "万年历与星座的运势，来测测？",
+        description: "本产品融合了北京时间，节日倒计时，自定义倒计时，AI分析，星座运势，和不同的多元节日订阅系统",
+        notice: "",
+        updates: [
+            { version: "v1.0.0", date: "2026-09-13", content: "网站发布并顺利运行，接入xiaoseven AI  Seven戚的首个自研理解模型" },
+        ],
+        screenshots: [
+            "https://i.ibb.co/mryN8YS3/QQ-20260913182611.png",
+        ],
+        collaborators: [
+            { id: "deep", name: "Deepseek", role: "网站框架" },
+            { id: "sevenqi", name: "Seven戚", role: "智能体编写" },
+            { id: "doubao", name: "豆包", role: "响应式布局设计" },
+        ]
+    },
     LYB: {
         id: "LYB",
         name: "Seven戚频道",
