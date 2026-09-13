@@ -77,7 +77,7 @@ const APPS = {
         id: "WNL",
         name: "小七万年历",
         icon: "??",
-        iconUrl: "<a href="https://i.ibb.co/1YSSvY8Q/QQ-20260913180715.png",
+        iconUrl: "https://i.ibb.co/1YSSvY8Q/QQ-20260913180715.png",
         developerId: "sevenqi",
         developer: "Seven戚",
         category: "tools",
