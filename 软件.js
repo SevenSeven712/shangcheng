@@ -89,7 +89,7 @@ const APPS = {
         downloads: "8.3万",
         version: "1.0.0",
         views: 22500,
-        website: "https://sevenseven712.github.io/long years/",
+        website: "https://sevenseven712.github.io/long-years/",
         shortDesc: "万年历与星座的运势，来测测？",
         description: "本产品融合了北京时间，节日倒计时，自定义倒计时，AI分析，星座运势，和不同的多元节日订阅系统",
         notice: "",
