@@ -102,7 +102,7 @@ const APPS = {
         collaborators: [
             { id: "deep", name: "Deepseek", role: "网站框架" },
             { id: "sevenqi", name: "Seven戚", role: "智能体编写" },
-            { id: "doubao", name: "豆包", role: "响应式布局设计" },
+            { id: "DouBao", name: "豆包", role: "响应式布局设计" },
         ]
     },
     LYB: {
@@ -126,6 +126,7 @@ const APPS = {
         description: "Seven戚频道是一个由Seven戚个人开发的聊天交流网站，同时也是他第一次将后端编程运用到自己的网站中运营。",
         notice: "",
         updates: [
+            { version: "v1.4.0", date: "2026-09-25", content: "1.优化登录界面UI，以及未设置头像自动提醒填写\n2.更新帅到爆炸的启动页并优化了用户体验" },
             { version: "v1.3.0", date: "2026-09-19", content: "1.新增举报功能，你现在可以将违规帖子或留言申报，我们将会第一时间处理相关违规帖子或留言\n2.新增bug反映，如果在我的其他网站发现bug，欢迎在此页面反映\n使用方法\n举报：点击帖子右下角举报按钮即可举报\n反映bug：（个人-反映bug）点击后选择要反映的网站然后填写原因\n查看举报反馈：(个人-消息中心)阅读完后后记得点击右上角的“全部已读”" },
             { version: "v1.2.0", date: "2026-09-11", content: "更新的底部导航栏图标为SVG" },
             { version: "v1.1.0", date: "2026-08-30", content: "1.点击顶部个人头像进入“个人”页面\n2.群聊未读消息红点显示\n3.底部导航栏和顶部导航栏兼容为js文件\n4.帖子发布支持富文本" },
@@ -162,7 +163,7 @@ const APPS = {
         description: "七七小说网，海量小说免费看！涵盖都市、玄幻、言情、悬疑等各类题材，每日更新，让你告别书荒。\n\n主要功能：\n? 海量小说资源，全本免费阅读\n? 多种阅读模式，护眼舒适\n? 智能推荐，发现更多好书\n? 书架管理，阅读进度同步",
         notice: "",
         updates: [
-            { version: "v1.8.0", date: "2026-06-18", content: "? 项目一次性开发完成，有完整交互" }
+            { version: "v1.8.0", date: "2026-07-15", content: "? 项目一次性开发完成，有完整交互" }
         ],
         screenshots: [
             "https://i.ibb.co/jqmkJj8/image.png",
@@ -194,7 +195,7 @@ const APPS = {
         description: "七七剧本杀，海量故事免费看！涵盖都市、玄幻、言情、悬疑等各类题材，每日更新，让你告别书荒。\n\n主要功能：\n? 海量互动小说资源，全游戏免费玩\n? 创作者中心，所有人也能做作者",
         notice: "",
         updates: [
-            { version: "v1.8.0", date: "2026-06-18", content: "? 项目一次性开发完成，有完整交互" },
+            { version: "v1.8.0", date: "2026-08-01", content: "? 项目一次性开发完成，有完整交互" },
         ],
         screenshots: [
             "https://i.ibb.co/LXCJxj5g/QQ20260801-163823.png",
@@ -352,7 +353,7 @@ const APPS = {
         description: "足球经理人是Seven戚个人创作的真实模拟当教练和经理人的游戏。\n\n主要玩法：\n? 购买转会球员\n? 炒作和吸粉\n? 建立自己的俱乐部\n? 带领队伍拿下超多奖项",
         notice: "",
         updates: [
-            { version: "v1.0.0 ", date: "2026-04-25", content: "?已上线，欢迎游玩哦" },
+            { version: "v1.0.0 ", date: "2026-08-04", content: "?已上线，欢迎游玩哦" },
         ],
         screenshots: [
             "https://i.ibb.co/n2qsM1M/QQ20260804-155946.png",
