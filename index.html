@@ -1071,6 +1071,135 @@
             .notice-btn { padding: 8px 16px; font-size: 14px; min-width: 60px; }
             #search-no-result { font-size: 13px; padding: 16px 0; }
         }
+
+        /* ==================== 毛玻璃 & 拟态 ==================== */
+        /* 关键前提：backdrop-filter 模糊的是背后像素，纯色底上看不出效果，所以先铺低饱和光斑 */
+        html { background: #f2f2f7; }
+        body { background: transparent; }
+        body::before {
+            content: "";
+            position: fixed;
+            inset: -15%;
+            z-index: -1;
+            pointer-events: none;
+            background:
+                radial-gradient(36% 30% at 16% 10%, rgba(0, 122, 255, 0.26), transparent 70%),
+                radial-gradient(32% 28% at 84% 20%, rgba(88, 86, 214, 0.22), transparent 72%),
+                radial-gradient(40% 34% at 70% 84%, rgba(90, 200, 250, 0.20), transparent 70%),
+                radial-gradient(28% 26% at 10% 76%, rgba(255, 149, 0, 0.13), transparent 70%);
+            filter: blur(50px) saturate(125%);
+        }
+
+        /* 悬浮层：头部 */
+        .header {
+            background: rgba(255, 255, 255, 0.62);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            backdrop-filter: blur(24px) saturate(180%);
+            border-bottom: 0.5px solid rgba(255, 255, 255, 0.55);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 1px 14px rgba(31, 38, 135, 0.07);
+        }
+        /* 悬浮层：底部导航 */
+        .bottom-nav {
+            background: rgba(255, 255, 255, 0.68);
+            -webkit-backdrop-filter: blur(26px) saturate(180%);
+            backdrop-filter: blur(26px) saturate(180%);
+            border-top: 0.5px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 -1px 18px rgba(31, 38, 135, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.72);
+        }
+        /* 悬浮层：各类弹窗卡片 */
+        .modal-card, .alert-card, .community-notice-card, .image-card {
+            background: rgba(255, 255, 255, 0.72);
+            -webkit-backdrop-filter: blur(28px) saturate(180%);
+            backdrop-filter: blur(28px) saturate(180%);
+            border: 0.5px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 24px 64px rgba(31, 38, 135, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+        }
+        /* 悬浮层：精选卡 */
+        .featured-card {
+            background: linear-gradient(135deg, rgba(0, 122, 255, 0.88), rgba(88, 86, 214, 0.82));
+            -webkit-backdrop-filter: blur(20px) saturate(160%);
+            backdrop-filter: blur(20px) saturate(160%);
+            border: 0.5px solid rgba(255, 255, 255, 0.38);
+            box-shadow: 0 12px 36px rgba(0, 90, 200, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.42);
+        }
+
+        /* 拟态：凸起（按钮 / 标签） */
+        .visit-btn.online, .rank-tab, .category-tab, .notice-btn.cancel {
+            background: #f0f0f5;
+            border: none;
+            box-shadow: 3px 3px 8px rgba(174, 174, 192, 0.42), -3px -3px 8px rgba(255, 255, 255, 0.92);
+        }
+        .visit-btn.online { color: #007AFF; }
+        .visit-btn.online:active, .rank-tab:active, .category-tab:active, .notice-btn.cancel:active {
+            box-shadow: inset 3px 3px 6px rgba(174, 174, 192, 0.5), inset -3px -3px 6px rgba(255, 255, 255, 0.9);
+        }
+        .rank-tab.active, .category-tab.active {
+            background: #007AFF;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+        }
+        /* 拟态：凹陷（搜索框） */
+        .search-bar {
+            background: #ebebf1;
+            box-shadow: inset 2px 2px 5px rgba(174, 174, 192, 0.42), inset -2px -2px 5px rgba(255, 255, 255, 0.85);
+        }
+        .search-bar:focus-within {
+            background: #fff;
+            box-shadow: inset 1px 1px 3px rgba(174, 174, 192, 0.3), 0 0 0 4px rgba(0, 122, 255, 0.16);
+        }
+
+        /* 更新日志版本标签 */
+        .update-ver-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+        .update-tag {
+            display: inline-flex;
+            align-items: center;
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 1;
+            padding: 3px 9px;
+            border-radius: 999px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .tag-major { background: linear-gradient(135deg, #007AFF, #5856D6); color: #fff; }
+        .tag-fix { background: rgba(52, 199, 89, 0.14); color: #248A3D; }
+        .tag-security { background: rgba(255, 59, 48, 0.13); color: #C4271D; }
+        .tag-default { background: rgba(142, 142, 147, 0.15); color: #636366; }
+
+        @media(prefers-reduced-motion: reduce) {
+            body::before { display: none; }
+        }
+
+
+        /* ==================== 图片骨架屏 ==================== */
+        @keyframes skeletonShimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        /* 容器在图片加载期间显示流光骨架屏（覆盖原有灰底） */
+        .img-skeleton {
+            background-image: linear-gradient(100deg, #e0e0e8 25%, #f5f5fa 50%, #e0e0e8 75%) !important;
+            background-size: 200% 100% !important;
+            animation: skeletonShimmer 1.3s ease-in-out infinite;
+        }
+        /* 图片从透明淡入，避免"啪"地一下出现 */
+        img.img-fade {
+            opacity: 0;
+            transition: opacity 0.35s ease;
+        }
+        img.img-fade.img-loaded {
+            opacity: 1;
+        }
+        @media(prefers-reduced-motion: reduce) {
+            .img-skeleton { animation: none; background: #e5e5ea !important; }
+            img.img-fade { transition: none; opacity: 1; }
+        }
+
     </style>
 </head>
 <body>
@@ -1153,14 +1282,13 @@
                 <button class="visit-btn online" id="detail-btn">访问</button>
             </div>
             <div class="detail-stats">
-                <div class="stat-item"><div class="stat-value" id="detail-rank">#1</div><div class="stat-label">排行榜</div></div>
+                <div class="stat-item"><div class="stat-value" id="detail-rank">#1</div><div class="stat-label" id="detail-rank-label">更新榜</div></div>
                 <div class="stat-item"><div class="stat-value" id="detail-rating">4.9</div><div class="stat-label">评分</div></div>
-                <div class="stat-item"><div class="stat-value" id="detail-downloads">10万+</div><div class="stat-label">下载</div></div>
                 <div class="stat-item"><div class="stat-value" id="detail-version">1.0.0</div><div class="stat-label">版本</div></div>
                 <div class="stat-item"><div class="stat-value">12+</div><div class="stat-label">年龄</div></div>
             </div>
 
-            <h3 class="detail-section-title">预览</h3>
+            <h3 class="detail-section-title" id="preview-title">预览</h3>
             <div id="status-banner" style="display:none; padding:12px 16px; border-radius:12px; margin-bottom:16px; font-size:14px; line-height:1.5; align-items:center; gap:10px;">
                 <span id="status-banner-icon" style="font-size:18px;"></span>
                 <span id="status-banner-text" style="flex:1;"></span>
@@ -1216,7 +1344,7 @@
                 <div class="developer-name-row">
                     <span class="developer-name" id="dev-name">开发者名称</span>
                     <span class="verified-badge badge-gold" id="dev-badge" title="网站站主专属"><i class="fa-solid fa-check"></i></span>
-                    <span class="dev-rating-downloads" id="dev-rating-downloads"><i class="fa-solid fa-star" style="color:#FFB800;"></i> 4.8 · 下载量50万+</span>
+                    <span class="dev-rating-downloads" id="dev-rating-downloads"></span>
                 </div>
                 <div class="developer-desc" id="dev-desc">开发者简介</div>
             </div>
@@ -1363,14 +1491,110 @@
                 return dateStr;
             }
 
-            function parseDownloads(str) {
-                if (!str) return 0;
-                let s = str.replace(/[+,]/g, '');
-                if (s.includes('万')) {
-                    const num = parseFloat(s.replace('万', ''));
-                    return num * 10000;
+            // 最新一条更新（按日期取最大，不依赖书写顺序）
+            function getLatestUpdate(app) {
+                if (!app.updates || !app.updates.length) return null;
+                let latest = null;
+                for (const u of app.updates) {
+                    if (!u.date) continue;
+                    if (!latest || u.date > latest.date) latest = u;
                 }
-                return parseFloat(s) || 0;
+                return latest;
+            }
+
+            // 版本号唯一真相源：最新更新日志
+            function getDisplayVersion(app) {
+                const u = getLatestUpdate(app);
+                const raw = (u && u.version) || app.version || '';
+                return raw.replace(/^v/i, '').replace(/[（(][^）)]*[）)]/g, '').trim() || '—';
+            }
+
+            function getUpdateTagClass(tag) {
+                if (!tag) return '';
+                if (/大版本|重大/.test(tag)) return 'tag-major';
+                if (/安全/.test(tag)) return 'tag-security';
+                if (/修复|补丁|bug/i.test(tag)) return 'tag-fix';
+                return 'tag-default';
+            }
+
+            // 版本号 + 可选椭圆标签
+            function renderUpdateHead(u) {
+                const tag = u.tag ? `<span class="update-tag ${getUpdateTagClass(u.tag)}">${u.tag}</span>` : '';
+                return `<div class="update-ver-row"><span>${u.version}</span>${tag}</div>`;
+            }
+
+            // 近三天用口语，更早直接显示真实日期
+            function timeAgo(dateStr) {
+                if (!dateStr) return '';
+                const d = new Date(dateStr.replace(' ', 'T'));
+                if (isNaN(d.getTime())) return dateStr;
+                const days = Math.floor((new Date().setHours(0, 0, 0, 0) - new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()) / 86400000);
+                if (days <= 0) return '刚刚';
+                if (days === 1) return '昨天';
+                if (days === 2) return '前天';
+                return dateStr;
+            }
+
+            // ---------- 图片骨架屏 ----------
+            function attachSkeleton(img) {
+                const holder = img.parentElement;
+                if (!holder) return;
+                // 已加载完成（缓存命中）则直接显示，不闪骨架屏
+                if (img.complete && img.naturalWidth > 0) {
+                    img.classList.add('img-fade', 'img-loaded');
+                    return;
+                }
+                img.classList.add('img-fade');
+                holder.classList.add('img-skeleton');
+                const done = () => {
+                    holder.classList.remove('img-skeleton');
+                    img.classList.add('img-loaded');
+                };
+                img.addEventListener('load', done, { once: true });
+                img.addEventListener('error', () => {
+                    holder.classList.remove('img-skeleton');
+                    img.classList.add('img-loaded');
+                    img.style.opacity = '0';
+                }, { once: true });
+                // 兜底：图片长时间无响应（如 DNS 卡死）也停止骨架屏，避免永远流光
+                setTimeout(() => {
+                    if (holder.classList.contains('img-skeleton')) {
+                        holder.classList.remove('img-skeleton');
+                        img.classList.add('img-loaded');
+                        if (!img.naturalWidth) img.style.opacity = '0';
+                    }
+                }, 10000);
+            }
+
+            // 扫描容器内所有图片并挂载骨架屏
+            function initSkeletons(root) {
+                (root || document).querySelectorAll('img:not([data-sk])').forEach(img => {
+                    img.dataset.sk = '1';
+                    attachSkeleton(img);
+                });
+            }
+
+            // 排名是计算结果，不是数据
+            function sortAppsByMode(apps, mode) {
+                const list = apps.slice();
+                if (mode === 'hot') {
+                    list.sort((a, b) => (b.rating - a.rating) || ((b.views || 0) - (a.views || 0)));
+                } else {
+                    list.sort((a, b) => {
+                        const da = getLatestUpdateDate(a) || '';
+                        const db = getLatestUpdateDate(b) || '';
+                        if (da === db) return b.rating - a.rating;
+                        return db.localeCompare(da);
+                    });
+                }
+                return list;
+            }
+
+            function getAppRank(appId) {
+                const label = homeSortMode === 'hot' ? '热门榜' : '更新榜';
+                const list = sortAppsByMode(getAllApps().filter(a => a.status === 'online'), homeSortMode);
+                const idx = list.findIndex(a => a.id === appId);
+                return { rank: idx >= 0 ? idx + 1 : '—', label };
             }
 
             function getDeveloperApps(devId) {
@@ -1491,32 +1715,29 @@
                 document.querySelectorAll('.rank-tab').forEach(tab => tab.classList.remove('active'));
                 if (el) el.classList.add('active');
                 renderHome();
+                if (currentPage === 'app-detail') {
+                    const detailName = document.getElementById('detail-name');
+                    const appId = detailName && detailName.dataset.appId;
+                    if (appId) {
+                        const info = getAppRank(appId);
+                        document.getElementById('detail-rank').textContent = info.rank === '—' ? '—' : '#' + info.rank;
+                        document.getElementById('detail-rank-label').textContent = info.label;
+                    }
+                }
             };
 
             // ---------- 渲染首页 ----------
             function renderHome() {
                 const container = document.getElementById('home-app-list');
-                let apps = getAllApps().filter(app => app.status === 'online');
-
-                if (homeSortMode === 'update') {
-                    apps.sort((a, b) => {
-                        const dateA = getLatestUpdateDate(a);
-                        const dateB = getLatestUpdateDate(b);
-                        if (dateA && !dateB) return -1;
-                        if (!dateA && dateB) return 1;
-                        if (!dateA && !dateB) return 0;
-                        if (dateA > dateB) return -1;
-                        if (dateA < dateB) return 1;
-                        return 0;
-                    });
-                } else {
-                    apps.sort((a, b) => parseDownloads(b.downloads) - parseDownloads(a.downloads));
-                }
+                const apps = sortAppsByMode(
+                    getAllApps().filter(app => app.status === 'online'),
+                    homeSortMode
+                );
 
                 container.innerHTML = apps.map((app, index) => {
                     const rankClass = index === 0 ? 'top-1' : index === 1 ? 'top-2' : index === 2 ? 'top-3' : '';
                     const latestDate = getLatestUpdateDate(app);
-                    const updateDisplay = latestDate ? `更新于 ${formatUpdateDate(latestDate)}` : '';
+                    const updateDisplay = latestDate ? `更新于 ${timeAgo(latestDate)}` : '';
                     return `
                             <div class="app-list-item" onclick="goToAppDetail('${app.id}')">
                                 <div class="rank-number ${rankClass}">${index + 1}</div>
@@ -1524,7 +1745,7 @@
                                 <div class="app-info">
                                     <div class="app-name-row">
                                         <span class="app-name">${app.name}</span>
-                                        <span class="app-rating-downloads"><i class="fa-solid fa-star"></i> ${app.rating} · ${app.downloads}</span>
+                                        <span class="app-rating-downloads"><i class="fa-solid fa-star"></i> ${app.rating}</span>
                                     </div>
                                     <div class="app-author-row">
                                         <span class="app-author-name" onclick="event.stopPropagation();goToDeveloper('${app.developerId}')">${app.developer}</span>
@@ -1536,6 +1757,7 @@
                             </div>
                         `;
                 }).join('');
+                initSkeletons(container);
             }
 
             // ---------- 应用列表（分类） ----------
@@ -1555,18 +1777,23 @@
                 } else if (category !== 'all') {
                     apps = apps.filter(a => a.category === category || a.categoryName === category);
                 }
-                apps.sort((a, b) => (a.rank || 999) - (b.rank || 999));
+                apps.sort((a, b) => {
+                    const da = getLatestUpdateDate(a) || '';
+                    const db = getLatestUpdateDate(b) || '';
+                    if (da !== db) return db.localeCompare(da);
+                    return b.rating - a.rating;
+                });
                 container.innerHTML = apps.map(app => {
                     const statusClass = app.status === 'online' ? 'online' : (app.status === 'beta' ? 'beta' : 'error');
                     const latestDate = getLatestUpdateDate(app);
-                    const updateDisplay = latestDate ? `更新于 ${formatUpdateDate(latestDate)}` : '';
+                    const updateDisplay = latestDate ? `更新于 ${timeAgo(latestDate)}` : '';
                     return `
                             <div class="app-list-item" onclick="goToAppDetail('${app.id}')">
                                 <div class="app-icon"><img src="${app.iconUrl}" alt="${app.name}" onerror="this.style.display='none'"/></div>
                                 <div class="app-info">
                                     <div class="app-name-row">
                                         <span class="app-name">${app.name}</span>
-                                        <span class="app-rating-downloads"><i class="fa-solid fa-star"></i> ${app.rating} · ${app.downloads}</span>
+                                        <span class="app-rating-downloads"><i class="fa-solid fa-star"></i> ${app.rating}</span>
                                     </div>
                                     <div class="app-author-row">
                                         <span class="app-author-name" onclick="event.stopPropagation();goToDeveloper('${app.developerId}')">${app.developer}</span>
@@ -1580,6 +1807,8 @@
                             </div>
                         `;
                 }).join('');
+
+                initSkeletons(container);
 
                 // 渲染后应用当前搜索过滤
                 const searchInput = document.getElementById('search-apps');
@@ -1597,13 +1826,16 @@
 
                 document.getElementById('detail-icon').innerHTML = `<img src="${app.iconUrl}" alt="${app.name}" onerror="this.style.display='none'"/>`;
                 document.getElementById('detail-name').textContent = app.name;
+                document.getElementById('detail-name').dataset.appId = app.id;
                 document.getElementById('detail-developer').innerHTML = `开发者：${app.developer}`;
                 document.getElementById('detail-developer').setAttribute('onclick', `goToDeveloper('${app.developerId}')`);
-                document.getElementById('detail-rank').textContent = `#${app.rank || 0}`;
+                const rankInfo = getAppRank(app.id);
+                document.getElementById('detail-rank').textContent = rankInfo.rank === '—' ? '—' : `#${rankInfo.rank}`;
+                document.getElementById('detail-rank-label').textContent = rankInfo.rank === '—' ? '未上榜' : rankInfo.label;
                 document.getElementById('detail-rating').textContent = app.rating;
-                document.getElementById('detail-downloads').textContent = app.downloads;
-                document.getElementById('detail-version').textContent = app.version;
-                document.getElementById('detail-info-version').textContent = app.version;
+                const displayVersion = getDisplayVersion(app);
+                document.getElementById('detail-version').textContent = displayVersion;
+                document.getElementById('detail-info-version').textContent = displayVersion;
                 document.getElementById('detail-category').textContent = app.categoryName || app.category;
                 document.getElementById('detail-status-text').textContent = app.statusText || '未知';
                 document.getElementById('detail-description').textContent = app.description || '暂无简介';
@@ -1622,15 +1854,20 @@
                     banner.style.display = 'none';
                 }
 
+                initSkeletons(document.getElementById('detail-icon'));
+
                 const scContainer = document.getElementById('screenshots-container');
-                if (app.screenshots && app.screenshots.length) {
+                const previewTitle = document.getElementById('preview-title');
+                const hasShots = !!(app.screenshots && app.screenshots.length);
+                previewTitle.style.display = hasShots ? '' : 'none';
+                scContainer.style.display = hasShots ? '' : 'none';
+                if (hasShots) {
                     scContainer.innerHTML = app.screenshots.map(url => `
                             <div class="screenshot" onclick="previewImage('${url}')">
                                 <img src="${url}" alt="截图" onerror="this.style.display='none'"/>
                             </div>
                         `).join('');
-                } else {
-                    scContainer.innerHTML = '<div style="color:#888;padding:10px 0;">暂无截图</div>';
+                    initSkeletons(scContainer);
                 }
 
                 const updateLog = document.getElementById('detail-update-log');
@@ -1640,7 +1877,7 @@
                     updateLog.innerHTML = showUpdates.map(u => `
                             <div class="update-item">
                                 <div class="update-version">
-                                    <span>${u.version}</span>
+                                    ${renderUpdateHead(u)}
                                     <span class="update-date">${u.date}</span>
                                 </div>
                                 <div class="update-content">${u.content}</div>
@@ -1691,6 +1928,8 @@
                     collabSection.style.display = 'none';
                 }
 
+                initSkeletons(document.getElementById('page-app-detail'));
+
                 const detailBtn = document.getElementById('detail-btn');
                 const stickyBtn = document.getElementById('sticky-visit-btn');
                 const updateVisitBtn = (btn) => {
@@ -1721,7 +1960,7 @@
                     list.innerHTML = updates.map(u => `
                             <div class="modal-update-item">
                                 <div class="modal-update-version">
-                                    <span>${u.version}</span>
+                                    ${renderUpdateHead(u)}
                                     <span class="modal-update-date">${u.date}</span>
                                 </div>
                                 <div class="modal-update-content">${u.content}</div>
@@ -1793,24 +2032,23 @@
                 document.getElementById('dev-desc').textContent = dev.description || '';
                 const { owned, assist } = getDeveloperApps(devId);
                 const allApps = [...owned, ...assist];
-                let totalDownloads = 0;
                 let totalRating = 0;
                 allApps.forEach(a => {
-                    const num = parseDownloads(a.downloads);
-                    if (!isNaN(num)) totalDownloads += num;
                     totalRating += parseFloat(a.rating) || 0;
                 });
                 const avgRating = allApps.length ? (totalRating / allApps.length).toFixed(1) : '0';
-                const downloadStr = totalDownloads > 10000 ? (totalDownloads / 10000).toFixed(1) + '万' : totalDownloads + '';
-                document.getElementById('dev-rating-downloads').innerHTML = `<i class="fa-solid fa-star" style="color:#FFB800;"></i> ${avgRating} · 下载量${downloadStr}+`;
+                document.getElementById('dev-rating-downloads').innerHTML = `<i class="fa-solid fa-star" style="color:#FFB800;"></i> ${avgRating} · ${allApps.length} 个应用`;
                 document.getElementById('dev-app-count').textContent = allApps.length;
 
                 const ownedContainer = document.getElementById('dev-owned-apps');
                 if (owned.length) {
                     ownedContainer.innerHTML = renderAppListItems(owned);
+                    initSkeletons(ownedContainer);
                 } else {
                     ownedContainer.innerHTML = '<div style="padding:12px 16px;color:#888;">暂无独立开发的应用</div>';
                 }
+
+                initSkeletons(document.getElementById('page-developer'));
 
                 const assistContainer = document.getElementById('dev-assist-apps');
                 const assistTitle = document.getElementById('dev-assist-title');
@@ -1828,14 +2066,14 @@
                 return apps.map(app => {
                     const statusClass = app.status === 'online' ? 'online' : (app.status === 'beta' ? 'beta' : 'error');
                     const latestDate = getLatestUpdateDate(app);
-                    const updateDisplay = latestDate ? `更新于 ${formatUpdateDate(latestDate)}` : '';
+                    const updateDisplay = latestDate ? `更新于 ${timeAgo(latestDate)}` : '';
                     return `
                             <div class="app-list-item" onclick="goToAppDetail('${app.id}')">
                                 <div class="app-icon"><img src="${app.iconUrl}" alt="${app.name}" onerror="this.style.display='none'"/></div>
                                 <div class="app-info">
                                     <div class="app-name-row">
                                         <span class="app-name">${app.name}</span>
-                                        <span class="app-rating-downloads"><i class="fa-solid fa-star"></i> ${app.rating} · ${app.downloads}</span>
+                                        <span class="app-rating-downloads"><i class="fa-solid fa-star"></i> ${app.rating}</span>
                                     </div>
                                     <div class="app-desc">${app.shortDesc}</div>
                                     ${updateDisplay ? `<div class="app-update-time"><i class="fa-solid fa-rotate"></i> <span class="update-date">${updateDisplay}</span></div>` : ''}
@@ -1903,6 +2141,7 @@
                             <div class="creator-arrow"><i class="fa-solid fa-chevron-right"></i></div>
                         </div>
                     `).join('');
+                initSkeletons(container);
             }
 
             // ---------- 搜索功能绑定 ----------
