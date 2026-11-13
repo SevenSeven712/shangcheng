@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8" />
+<link rel="manifest" href="./manifest.json" />
+<meta name="theme-color" content="#10B981" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>后台管理 · Seven戚</title>
+<link rel="stylesheet" href="./theme.css" />
+<script src="./vendor/supabase.js"></script>
+<script src="./common.js"></script>
+<style>
+.app-header{display:flex;align-items:center;padding:12px 16px;background:var(--bg-glass);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);}
+.app-header .back{background:none;border:none;cursor:pointer;color:var(--text);display:flex;padding:4px;border-radius:8px;}
+.app-header .back svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.app-header .title{font-weight:700;font-size:1.05em;flex:1;}
+.admin-body{flex:1;overflow-y:auto;padding:20px 16px calc(24px + env(safe-area-inset-bottom));}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;}
+.stat-card{background:var(--bg-surface);border-radius:var(--radius-md);padding:16px;border:1px solid var(--border);box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:8px;}
+.stat-card .label{font-size:0.85em;color:var(--text-muted);font-weight:600;}
+.stat-card .value{font-size:2em;font-weight:700;color:var(--brand);}
+.admin-tabs{display:flex;gap:8px;margin-bottom:20px;background:var(--bg);padding:4px;border-radius:var(--radius-pill);border:1px solid var(--border);overflow-x:auto;scrollbar-width:none;}
+.admin-tab{flex:1;padding:10px;border:none;background:transparent;border-radius:var(--radius-pill);font-family:inherit;font-size:.9em;font-weight:600;color:var(--text-muted);cursor:pointer;white-space:nowrap;}
+.admin-tab.active{background:var(--bg-surface);color:var(--brand);box-shadow:var(--shadow-sm);}
+.list-container{background:var(--bg-surface);border-radius:var(--radius-md);border:1px solid var(--border);overflow:hidden;}
+.list-item{display:flex;align-items:center;gap:12px;padding:16px;border-bottom:1px solid var(--border-subtle);}
+.list-item:last-child{border-bottom:none;}
+.list-item .avatar{width:40px;height:40px;border-radius:50%;background:var(--brand-bg);color:var(--brand-dark);display:grid;place-items:center;font-weight:600;font-size:16px;background-size:cover;background-position:center;}
+.list-item .info{flex:1;min-width:0;}
+.list-item .name{font-weight:600;color:var(--text);display:flex;align-items:center;gap:6px;}
+.list-item .meta{font-size:0.75em;color:var(--text-muted);margin-top:4px;}
+.list-item .actions{display:flex;gap:8px;flex-wrap:wrap;}
+.btn-sm{padding:6px 12px;border-radius:var(--radius-sm);border:none;font-size:0.8em;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;}
+.btn-ban{background:var(--danger-bg);color:var(--danger);}
+.btn-unban{background:var(--brand-bg);color:var(--brand-dark);}
+.btn-coin-add{background:#EFF6FF;color:#2563EB;}
+.btn-coin-sub{background:#FEF2F2;color:#DC2626;}
+.btn-warning{background:#FEF3C7;color:#D97706;}
+.btn-sort{background:#F1F5F9;color:#475569;padding:6px 10px;}
+.banned-tag{background:var(--danger-bg);color:var(--danger);font-size:0.65em;padding:2px 6px;border-radius:4px;}
+.admin-tag{background:#F3E8FF;color:#7E22CE;font-size:0.65em;padding:2px 6px;border-radius:4px;margin-left:6px;}
+.forbidden-wrap{position:fixed;inset:0;background:#f8fafc;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:99999;font-family:var(--font-family);}
+.forbidden-code{font-size:6em;font-weight:900;color:#ef4444;line-height:1;}
+.forbidden-desc{font-size:1.2em;color:#64748b;margin:16px 0 24px;font-weight:500;}
+.forbidden-btn{padding:10px 24px;border-radius:8px;background:#10b981;color:#fff;text-decoration:none;font-weight:600;}
+.tx-amount.plus{color:#10B981;font-weight:700;}
+.tx-amount.minus{color:#EF4444;font-weight:700;}
+</style>
+</head>
+<body>
+<div id="authLoading" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;font-weight:600;color:var(--text-muted);z-index:9999;background:var(--bg);">正在校验权限...</div>
+<div id="forbiddenScreen" class="forbidden-wrap" style="display:none;">
+  <div class="forbidden-code">403</div>
+  <div class="forbidden-desc">Access Denied. 您不是管理员。</div>
+  <a href="./posts.html" class="forbidden-btn">返回首页</a>
+</div>
+<div id="mainApp" style="display:none;flex-direction:column;height:100vh;">
+  <div class="app-header">
+    <button class="back" onclick="history.back()"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></button>
+    <span class="title">后台管理</span>
+    <div style="width:32px;"></div>
+  </div>
+  <div class="admin-body">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="label">总注册用户</div><div class="value" id="totalUsers">--</div></div>
+      <div class="stat-card"><div class="label">当前封禁数</div><div class="value" style="color:var(--danger);" id="bannedUsers">--</div></div>
+    </div>
+    <div class="admin-tabs">
+      <button class="admin-tab active" data-tab="users">用户管理</button>
+      <button class="admin-tab" data-tab="transactions">账单流水</button>
+      <button class="admin-tab" data-tab="reports">举报处理</button>
+      <button class="admin-tab" data-tab="categories">分类管理</button>
+    </div>
+    <div id="listContainer" class="list-container"></div>
+  </div>
+</div>
+<script>
+var currentUser = getSessionUser();
+if (!currentUser || !currentUser.id) window.location.href = './index.html';
+var currentTab = 'users';
+var currentCategories = [];
+
+async function showToast(msg) { await window.showCustomAlert('提示', msg); }
+
+// 核心安全：每次进入后台直接向 Supabase 验证身份，绝不信任前端的本地存储
+(async function initAuth() {
+  try {
+    var r = await window.sb.rpc('get_my_profile');
+    var profile = Array.isArray(r.data) ? r.data[0] : r.data;
+    if (!profile || profile.is_admin !== true) throw new Error('Unauthorized');
+    
+    currentUser.is_admin = true; setSessionUser(currentUser);
+    document.getElementById('authLoading').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'flex';
+    loadUsers();
+  } catch(e) {
+    document.getElementById('authLoading').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'none';
+    document.getElementById('forbiddenScreen').style.display = 'flex';
+  }
+})();
+
+document.querySelectorAll('.admin-tab').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    currentTab = this.dataset.tab;
+    document.querySelectorAll('.admin-tab').forEach(function(b) { b.classList.toggle('active', b.dataset.tab === currentTab); });
+    if (currentTab === 'users') loadUsers();
+    else if (currentTab === 'transactions') loadTransactions();
+    else if (currentTab === 'reports') loadReports();
+    else if (currentTab === 'categories') loadCategories();
+  });
+});
+
+document.getElementById('listContainer').addEventListener('click', function(e) {
+  var btn = e.target.closest('button'); if (!btn) return;
+  var action = btn.dataset.action; var uid = btn.dataset.id; var catId = btn.dataset.cat; var repId = btn.dataset.rep;
+  if (action === 'add') window.changeCoins(uid, 'add');
+  else if (action === 'sub') window.changeCoins(uid, 'sub');
+  else if (action === 'ban') window.banUser(uid);
+  else if (action === 'unban') window.unbanUser(uid);
+  else if (action === 'delete-report') window.deleteReport(repId);
+  else if (action === 'delete-cat') window.deleteCategory(catId);
+  else if (action === 'add-cat') window.addCategory();
+  else if (action === 'toggle-cat-admin') window.toggleCategoryAdmin(catId, btn.dataset.val === 'true');
+  else if (action === 'move-up') window.moveCategory(parseInt(btn.dataset.index), -1);
+  else if (action === 'move-down') window.moveCategory(parseInt(btn.dataset.index), 1);
+});
+
+async function loadUsers() {
+  var container = document.getElementById('listContainer');
+  container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);">加载中...</div>';
+  try {
+    var r = await window.sb.rpc('admin_list_users');
+    if (r.error) throw r.error;
+    var users = r.data || [];
+    var html = ''; var total = users.length; var bannedCount = 0;
+    users.forEach(function(u) {
+      var isBanned = u.banned_until && new Date(u.banned_until) > new Date();
+      if (isBanned) bannedCount++;
+      var avStyle = (u.avatar_url && u.avatar_url.indexOf('http') === 0) ? 'background-image:url('+u.avatar_url+');' : '';
+      var initial = avStyle ? '' : escapeHtml(String(u.nickname||'U').charAt(0).toUpperCase());
+      html += '<div class="list-item"><div class="avatar" style="'+avStyle+'">'+initial+'</div><div class="info"><div class="name">' + escapeHtml(u.nickname || '未命名') + ' ' + (isBanned ? '<span class="banned-tag">已封禁</span>' : '') + '</div><div class="meta">余额: <span style="color:var(--warning);font-weight:700;">'+ (u.coins || 0) +'</span> 币 | IP: ' + escapeHtml(u.ip_address || '未知') + '</div></div><div class="actions">';
+      html += '<button class="btn-sm btn-coin-add" data-action="add" data-id="'+u.id+'">加币</button><button class="btn-sm btn-coin-sub" data-action="sub" data-id="'+u.id+'">减币</button>';
+      if (isBanned) html += '<button class="btn-sm btn-unban" data-action="unban" data-id="'+u.id+'">解封</button>';
+      else if (u.id !== currentUser.id) html += '<button class="btn-sm btn-ban" data-action="ban" data-id="'+u.id+'">封禁</button>';
+      html += '</div></div>';
+    });
+    container.innerHTML = html || '<div style="padding:20px;text-align:center;color:var(--text-muted);">暂无用户</div>';
+    document.getElementById('totalUsers').textContent = total; document.getElementById('bannedUsers').textContent = bannedCount;
+  } catch(e) { container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--danger);">加载失败</div>'; }
+}
+
+async function loadTransactions() {
+  var container = document.getElementById('listContainer');
+  document.getElementById('totalUsers').textContent = '-';
+  document.getElementById('bannedUsers').textContent = '-';
+  container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);">加载中...</div>';
+  try {
+    // 数据库 RLS 已配置：管理员查询会返回全站数据，普通用户即使伪造前端进入，也只会返回自己的数据
+    var r = await window.sb.from('coin_transactions').select('*, users(nickname)').order('created_at', { ascending: false }).limit(100);
+    if (r.error) throw r.error;
+    var list = r.data || [];
+    if (!list.length) { container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-muted);">暂无账单记录</div>'; return; }
+    
+    container.innerHTML = list.map(function(tx) {
+      var isPlus = tx.amount >= 0;
+      var uname = tx.users ? tx.users.nickname : '未知用户';
+      var time = new Date(tx.created_at).toLocaleString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+      return '<div class="list-item" style="flex-direction:column;align-items:flex-start;">' +
+        '<div style="display:flex;width:100%;justify-content:space-between;align-items:center;">' +
+          '<div style="font-weight:700;font-size:0.95em;">' + escapeHtml(uname) + '</div>' +
+          '<div class="tx-amount ' + (isPlus ? 'plus' : 'minus') + '">' + (isPlus ? '+' : '') + tx.amount + '</div>' +
+        '</div>' +
+        '<div style="font-size:0.85em;color:var(--text-muted);margin-top:6px;width:100%;">' + escapeHtml(tx.reason || '系统调整') + '</div>' +
+        '<div style="font-size:0.7em;color:var(--text-light);margin-top:8px;">' + time + '</div>' +
+      '</div>';
+    }).join('');
+  } catch(e) { container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--danger);">加载失败：' + e.message + '</div>'; }
+}
+
+window.changeCoins = async function(uid, type) {
+  var amountStr = await window.showCustomPrompt(type === 'add' ? '增加余额' : '扣除余额', '请输入金额');
+  if (!amountStr || !amountStr.trim()) return;
+  var amount = parseInt(amountStr, 10);
+  if (isNaN(amount) || amount <= 0) return showToast('请输入有效数字');
+  try {
+    var reasonText = type === 'add' ? '管理员增加余额' : '管理员扣除余额';
+    var r = await window.sb.rpc('admin_change_user_coins', { p_target_user_id: uid, p_amount: amount, p_is_add: type === 'add', p_reason: reasonText });
+    if (r.error) throw r.error;
+    if (r.data && r.data.ok === false) throw new Error(r.data.message);
+    showToast('操作成功！当前余额：' + r.data.new_balance + ' 币'); loadUsers();
+  } catch(e) { showToast('操作失败：' + e.message); }
+};
+
+window.banUser = async function(id) {
+  if (!(await window.showCustomConfirm('封禁', '确认封禁该用户？'))) return;
+  try { await window.sb.rpc('admin_ban_user', { p_user_id: id, p_days: 36500, p_reason: '违反规定' }); showToast('已封禁'); loadUsers(); } catch(e) { showToast('封禁失败：' + e.message); }
+};
+window.unbanUser = async function(id) {
+  if (!(await window.showCustomConfirm('解封', '确认解封？'))) return;
+  try { await window.sb.rpc('admin_unban_user', { p_user_id: id }); showToast('已解封'); loadUsers(); } catch(e) { showToast('解封失败：' + e.message); }
+};
+
+async function loadReports() {
+  var container = document.getElementById('listContainer'); container.innerHTML = '<div style="padding:20px;text-align:center;">加载中...</div>';
+  document.getElementById('totalUsers').textContent = '-'; document.getElementById('bannedUsers').textContent = '-';
+  try {
+    var r = await window.sb.from('reports').select('*').order('created_at', { ascending: false });
+    var list = r.data || []; if (!list.length) { container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-muted);">暂无举报记录</div>'; return; }
+    container.innerHTML = list.map(function(rep) {
+      return '<div class="list-item" style="flex-direction:column;align-items:flex-start;"><div style="display:flex;width:100%;justify-content:space-between;"><b style="color:var(--danger);">举报人：'+escapeHtml(rep.reporter_name||'')+'</b></div><div style="font-size:.85em;width:100%;background:var(--bg);padding:12px;border-radius:8px;margin-top:8px;">类型：' + escapeHtml(rep.type) + '<br>内容：' + escapeHtml(rep.content_snapshot) + '</div><div style="display:flex;width:100%;justify-content:flex-end;margin-top:8px;"><button class="btn-sm btn-ban" data-action="delete-report" data-rep="'+rep.id+'">已处理</button></div></div>';
+    }).join('');
+  } catch(e) { container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--danger);">加载失败</div>'; }
+}
+window.deleteReport = async function(id) { if (!(await window.showCustomConfirm('删除', '确认已处理该举报？'))) return; try { await window.sb.from('reports').delete().eq('id', id); loadReports(); } catch(e) { showToast('删除失败：' + e.message); } };
+
+async function loadCategories() {
+  var container = document.getElementById('listContainer'); container.innerHTML = '<div style="padding:20px;text-align:center;">加载中...</div>';
+  document.getElementById('totalUsers').textContent = '-'; document.getElementById('bannedUsers').textContent = '-';
+  try {
+    var r = await window.sb.from('categories').select('*').order('sort_order');
+    currentCategories = r.data || [];
+    var html = '<div style="padding:16px;"><div style="display:flex;gap:8px;margin-bottom:16px;"><input type="text" id="newCatName" placeholder="新分类名称" style="flex:1;padding:10px;border-radius:8px;border:1px solid #ccc;outline:none;"><button class="btn-sm btn-unban" data-action="add-cat" style="padding:10px 16px;border-radius:8px;font-weight:600;">添加</button></div>';
+    if (!currentCategories.length) html += '<div style="text-align:center;padding:20px;">暂无分类</div>';
+    else {
+      html += '<div style="border-radius:8px;border:1px solid var(--border);overflow:hidden;">';
+      currentCategories.forEach(function(c, idx) { 
+        var tag = c.is_admin_only ? '<span class="admin-tag">仅管理员</span>' : '';
+        var toggleVal = c.is_admin_only ? 'false' : 'true';
+        var upBtn = idx > 0 ? '<button class="btn-sm btn-sort" data-action="move-up" data-index="'+idx+'">↑</button>' : '<button class="btn-sm btn-sort" style="opacity:0.3;cursor:not-allowed;">↑</button>';
+        var downBtn = idx < currentCategories.length - 1 ? '<button class="btn-sm btn-sort" data-action="move-down" data-index="'+idx+'">↓</button>' : '<button class="btn-sm btn-sort" style="opacity:0.3;cursor:not-allowed;">↓</button>';
+        html += '<div style="border-bottom:1px solid var(--border-subtle);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">';
+        html += '<div class="name">' + escapeHtml(c.name) + tag + '</div><div style="display:flex;gap:6px;align-items:center;"><div style="display:flex;gap:2px;margin-right:6px;">' + upBtn + downBtn + '</div>';
+        html += '<button class="btn-sm ' + (c.is_admin_only ? 'btn-ban' : 'btn-warning') + '" data-action="toggle-cat-admin" data-cat="' + c.id + '" data-val="' + toggleVal + '">' + (c.is_admin_only ? '取消仅管理员' : '设为仅管理员') + '</button>';
+        html += '<button class="btn-sm btn-ban" data-action="delete-cat" data-cat="' + c.id + '">删除</button></div></div>'; 
+      });
+      html += '</div>';
+    }
+    html += '</div>'; container.innerHTML = html;
+  } catch(e) { container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--danger);">加载失败：' + e.message + '</div>'; }
+}
+
+window.moveCategory = async function(index, direction) {
+  var targetIdx = index + direction; if (targetIdx < 0 || targetIdx >= currentCategories.length) return;
+  var cat1 = currentCategories[index], cat2 = currentCategories[targetIdx];
+  try {
+    var r1 = await window.sb.from('categories').update({ sort_order: cat2.sort_order }).eq('id', cat1.id);
+    var r2 = await window.sb.from('categories').update({ sort_order: cat1.sort_order }).eq('id', cat2.id);
+    if (r1.error || r2.error) throw new Error('权限不足');
+    loadCategories(); 
+  } catch(e) { showToast('调整顺序失败：' + e.message); }
+};
+
+window.addCategory = async function() {
+  var name = document.getElementById('newCatName').value.trim(); if(!name) return showToast('请输入名称');
+  try { 
+    var isAdminOnly = await window.showCustomConfirm('设置权限', '是否将此分类设为“仅管理员可选”发帖？');
+    var r = await window.sb.from('categories').insert([{ name: name, sort_order: 99, is_public: true, is_admin_only: !!isAdminOnly }]);
+    if (r.error) throw r.error;
+    loadCategories(); showToast('添加成功');
+  } catch(e) { showToast('添加失败：' + e.message); }
+};
+
+window.toggleCategoryAdmin = async function(id, val) {
+  try { var r = await window.sb.from('categories').update({ is_admin_only: val }).eq('id', id); if (r.error) throw r.error; showToast('权限更新成功'); loadCategories(); } catch(e) { showToast('权限更新失败：' + e.message); }
+};
+
+window.deleteCategory = async function(id) {
+  var confirmed = await window.showCustomConfirm('删除分类', '确定删除该分类吗？');
+  if (!confirmed) return;
+  try {
+    var upRes = await window.sb.from('posts').update({ category_id: null }).eq('category_id', id);
+    var delRes = await window.sb.from('categories').delete().eq('id', id);
+    showToast('分类删除成功'); loadCategories();
+  } catch(e) { window.showCustomAlert('删除失败', e.message || '未知错误'); }
+};
+</script>
+</body>
+</html>

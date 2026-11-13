@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8" />
+<link rel="manifest" href="./manifest.json" />
+<meta name="theme-color" content="#65A30D" />
+<link rel="stylesheet" href="./theme.css" />
+<link rel="stylesheet" href="bubbles.css" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Seven戚 · 聊天群</title>
+<script src="./vendor/supabase.js"></script>
+<style>
+html,body{overflow:hidden;background:var(--bg)}
+#mainApp{display:flex;flex-direction:column;height:100vh;height:100dvh;max-width:1400px;margin:0 auto;background:var(--bg);position:relative;}
+.app-content{flex:1;min-height:0;display:flex;flex-direction:column}
+.chat-messages{flex:1;overflow-y:auto;padding:16px 14px 8px;display:flex;flex-direction:column;gap:14px;position:relative}
+.row{display:flex;align-items:flex-start;gap:8px;max-width:85%;}
+.row.other{align-self:flex-start;}
+.row.self{align-self:flex-end;flex-direction:row-reverse;}
+.row .avatar{width:38px;height:38px;border-radius:50%;flex-shrink:0;background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:700;font-size:15px;background-size:cover;background-position:center;}
+.row .bubble-wrap{display:flex;flex-direction:column;min-width:0;align-items:flex-start;}
+.row.self .bubble-wrap{align-items:flex-end;}
+.row .bubble{padding:10px 14px;font-size:.88em;line-height:1.5;word-break:break-word;position:relative;background:#fff;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.1);cursor:pointer;}
+.row.self .bubble{background:#95ec69;color:#1a1a1a;}
+.row .uname{font-size:.68em;color:var(--text-muted);margin-bottom:3px;display:flex;align-items:center;gap:6px;}
+.row.self .uname{flex-direction:row-reverse;text-align:right;}
+.empty-tip{text-align:center;padding:20px;color:var(--text-muted);font-size:.9em;margin:auto}
+
+.red-packet-bubble { background: linear-gradient(135deg, #F87171, #DC2626) !important; color: #fff !important; width: 200px; border-radius: 12px !important; padding: 12px !important; }
+.rp-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-weight: 700; font-size: 0.95em; }
+.rp-icon { width: 24px; height: 24px; background: #ffe082; border-radius: 4px; display: grid; place-items: center; color: #e53935; }
+.rp-text { font-size: 0.8em; opacity: 0.9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rp-footer { border-top: 1px solid rgba(255,255,255,0.2); margin-top: 8px; padding-top: 6px; font-size: 0.65em; opacity: 0.8; }
+
+.side-panel{flex-shrink:0;display:flex;flex-direction:column;background:var(--bg);}
+.tool-bar{flex-shrink:0;padding:8px 16px 0;display:flex;gap:8px;overflow-x:auto;background:var(--bg);}
+.room-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-pill);border:1px solid var(--border-subtle);background:var(--bg-surface);color:var(--text-muted);font-weight:600;font-size:.85em;cursor:pointer;transition:var(--transition-smooth);font-family:inherit;box-shadow:0 2px 8px rgba(0,0,0,0.02);}
+.fixed-input-area{flex-shrink:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:var(--bg-glass);backdrop-filter:blur(16px);border-top:1px solid var(--border);display:flex;gap:10px;align-items:center;z-index:10}
+.fixed-input-area .input-wrapper{flex:1;display:flex;gap:10px;min-width:0}
+.fixed-input-area input{flex:1;padding:12px 16px;border-radius:var(--radius-pill);border:1px solid var(--border-subtle);background:var(--bg-surface);font-family:inherit;font-size:.9em;outline:none;min-width:0;color:var(--text);}
+.fixed-input-area button{padding:12px 20px;border-radius:var(--radius-pill);border:none;background:var(--brand);color:#fff;font-weight:600;font-size:.9em;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;font-family:inherit;}
+
+.context-menu { position: fixed; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); box-shadow: var(--shadow-md); padding: 6px; z-index: 9999; display: none; flex-direction: column; min-width: 130px; gap: 4px; }
+.context-menu.show { display: flex; }
+.context-menu button { display: flex; align-items: center; justify-content: flex-start; gap: 8px; width: 100%; background: none; border: none; padding: 10px 12px; text-align: left; font-size: 0.85em; font-family: inherit; color: var(--text); cursor: pointer; border-radius: 6px; white-space: nowrap; transition: var(--transition-smooth); box-sizing: border-box; }
+.context-menu button svg { width: 16px !important; height: 16px !important; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.context-menu button.danger { background: rgba(239, 68, 68, 0.08); color: var(--danger); }
+.context-menu button.danger:hover { background: rgba(239, 68, 68, 0.15); }
+.context-menu button.warning { background: rgba(245, 158, 11, 0.08); color: #D97706; }
+.context-menu button.warning:hover { background: rgba(245, 158, 11, 0.15); }
+
+.modal-overlay{position:fixed;inset:0;z-index:1000;background:rgba(17,24,39,.4);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:20px;animation:fadeIn .2s ease;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-overlay.active{display:flex;}
+.modal-box{background:var(--bg-surface);border-radius:var(--radius-lg);max-width:360px;width:100%;padding:24px;box-shadow:0 20px 40px rgba(0,0,0,.1);text-align:center;animation:popIn .3s cubic-bezier(0.34,1.56,0.64,1);}
+@keyframes popIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-box h3{font-size:1.2em;margin-bottom:16px;color:var(--text);font-weight:700;}
+.modal-box p{font-size:.9em;color:var(--text-muted);line-height:1.6;margin-bottom:24px;}
+.modal-box .mb-actions{display:flex;gap:12px;}
+.modal-box .mb-actions button{flex:1;padding:14px;border-radius:var(--radius-pill);border:none;font-family:inherit;font-weight:600;font-size:.95em;cursor:pointer;transition:var(--transition-smooth);}
+.modal-box .mb-actions button:active{transform:scale(.96);}
+.modal-box .mb-cancel{background:var(--bg);color:var(--text-muted);}
+.modal-box .mb-ok{background:var(--brand);color:#fff;box-shadow:0 4px 12px rgba(132,204,22,0.3);}
+.modal-box .mb-ok:disabled{opacity:.5;pointer-events:none;box-shadow:none;}
+
+.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; text-align: left; }
+.form-group label { font-size: 0.8em; font-weight: 600; color: var(--text-muted); }
+.form-group input, .form-group select, .form-group textarea { padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); font-size: 1em; outline: none; background: var(--bg); color: var(--text); font-family: inherit; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--brand); }
+.form-group textarea { resize: vertical; min-height: 80px; }
+</style>
+</head>
+<body>
+<div id="mainApp">
+  <div id="header-container"></div>
+  <div class="app-content">
+    <div class="chat-messages" id="chatMessages">
+      <div style="text-align:center;padding:20px;color:var(--text-muted);">加载中...</div>
+    </div>
+    <div class="side-panel">
+      <div class="tool-bar">
+        <button class="room-btn" onclick="location.href='./room.html'">
+          <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          房间
+        </button>
+      </div>
+      <div class="fixed-input-area">
+        <button id="chatRedPacketBtn" style="background:linear-gradient(135deg,#F87171,#DC2626);">
+          <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:#fff;"><rect x="3" y="2" width="18" height="20" rx="2"/><path d="M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2c-2.5 1.5-5.5 2.5-9 2.5S5.5 8.5 3 7V5Z" style="fill:#ffe082"/><circle cx="12" cy="15" r="2.5" style="fill:#e53935"/></svg>
+          红包
+        </button>
+        <div class="input-wrapper">
+          <input type="text" id="chatInput" placeholder="说点什么…" maxlength="200" />
+          <button id="sendChatBtn">发送</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="footer-container"></div>
+</div>
+
+<div id="contextMenu" class="context-menu"></div>
+
+<div class="modal-overlay" id="sendRpModal">
+  <div class="modal-box">
+    <h3>发红包</h3>
+    <div class="form-group">
+      <label>金额 (小七币)</label>
+      <input type="number" id="rpAmount" placeholder="0.00" min="1" step="1" />
+    </div>
+    <div class="form-group">
+      <label>祝福语</label>
+      <input type="text" id="rpMessage" placeholder="恭喜发财，大吉大利" maxlength="20" />
+    </div>
+    <div class="mb-actions">
+      <button class="mb-cancel" onclick="document.getElementById('sendRpModal').classList.remove('active')">取消</button>
+      <button class="mb-ok" id="sendRpBtn">塞钱进红包</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="openRpModal">
+  <div class="modal-box" style="background:linear-gradient(135deg,#F87171,#DC2626);color:#fff;">
+    <h3 style="color:#fff;margin-top:20px;">红包详情</h3>
+    <div id="rpOpenResult" style="font-size:3em;font-weight:700;margin:20px 0;color:#ffe082;">0</div>
+    <p style="color:rgba(255,255,255,0.8);" id="rpOpenMsg"></p>
+    <div class="mb-actions">
+      <button class="mb-ok" style="background:#ffe082;color:#DC2626;" onclick="document.getElementById('openRpModal').classList.remove('active')">开心收下</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="reportModal">
+  <div class="modal-box" style="text-align: left;">
+    <h3>举报违规内容</h3>
+    <div class="form-group">
+      <label>违规类型</label>
+      <select id="reportType">
+        <option value="色情低俗">色情低俗</option>
+        <option value="广告骚扰">广告骚扰</option>
+        <option value="人身攻击">人身攻击</option>
+        <option value="违法违规">违法违规</option>
+        <option value="其他">其他</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>补充说明（选填）</label>
+      <textarea id="reportRemark" placeholder="请描述具体的违规情况..."></textarea>
+    </div>
+    <div class="mb-actions">
+      <button class="mb-cancel" onclick="document.getElementById('reportModal').classList.remove('active')">取消</button>
+      <button class="mb-ok" style="background:#F59E0B;" onclick="submitReport()">提交举报</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-box">
+    <h3 id="confirmTitle">提示</h3>
+    <p id="confirmDesc"></p>
+    <div class="mb-actions">
+      <button class="mb-cancel" onclick="resolveConfirm(false)">取消</button>
+      <button class="mb-ok" id="confirmOkBtn" onclick="resolveConfirm(true)">确定</button>
+    </div>
+  </div>
+</div>
+
+<script src="./common.js"></script>
+<script>
+var currentUser = getSessionUser();
+if (!currentUser || !currentUser.id) window.location.href = './index.html';
+
+renderHeader('聊天群', 'chats');
+renderFooter('chats');
+
+var chats = [], usersCache = {};
+var isAdmin = currentUser.is_admin === true;
+
+var confirmResolve = null;
+window.showCustomConfirm = function(title, desc) {
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmDesc').innerHTML = desc;
+  document.getElementById('confirmModal').classList.add('active');
+  return new Promise(function(resolve) { confirmResolve = resolve; });
+};
+window.resolveConfirm = function(val) {
+  document.getElementById('confirmModal').classList.remove('active');
+  if (confirmResolve) confirmResolve(val);
+};
+
+async function loadChats() {
+  var container = document.getElementById('chatMessages');
+  try {
+    // 获取消息和用户信息（前端合并，避免嵌套查询玄学问题）
+    const [cRes, uRes] = await Promise.all([
+      window.sb.from('chats').select('*').order('created_at', { ascending: true }).limit(100),
+      window.sb.from('users').select('id, nickname, avatar_url')
+    ]);
+    
+    var rawChats = cRes.data || [];
+    var allUsers = uRes.data || [];
+    
+    usersCache = {};
+    allUsers.forEach(u => usersCache[u.id] = u);
+    
+    chats = rawChats.map(c => ({
+        ...c,
+        users: usersCache[c.user_id] || null
+    }));
+    
+    renderChat();
+  } catch (e) { 
+    container.innerHTML = '<div style="text-align:center;color:red;padding:20px;">加载失败</div>'; 
+  }
+}
+
+function parseRpContent(content) {
+  if (content && content.indexOf('[红包]') === 0) {
+    try { return JSON.parse(content.substring(4)); } catch(e) { return null; }
+  }
+  return null;
+}
+
+function renderChat() {
+  var container = document.getElementById('chatMessages');
+  if (!chats.length) { container.innerHTML = '<div class="empty-tip">还没有聊天消息，说点什么吧~</div>'; return; }
+  var html = '';
+  chats.forEach(function(c) {
+    if (c.content && c.content.indexOf('[系统消息]') === 0) {
+      var parts = c.content.replace('[系统消息]', '').split('|');
+      html += '<div style="text-align:center;margin:12px 0;font-size:0.75em;color:var(--text-light);"><span style="color:#3B82F6;font-weight:600;">' + escapeHtml(parts[0]) + '</span> ' + escapeHtml(parts[1] || '') + '</div>';
+      return;
+    }
+    var isSelf = c.user_id === currentUser.id;
+    var name = c.users ? c.users.nickname : (c.author || '匿名');
+    var finalAvatar = c.users && c.users.avatar_url ? c.users.avatar_url : getUserAvatar({ nickname: name });
+    var av = '<div class="avatar" style="background-image:url(' + finalAvatar + ');background-size:cover;background-position:center;"></div>';
+    var ctxAttr = 'oncontextmenu="showContextMenu(event, \'' + c.id + '\', ' + isSelf + ')"';
+    
+    var rpData = parseRpContent(c.content);
+    var bubbleContent = '';
+    if (rpData) {
+      bubbleContent = '<div class="bubble red-packet-bubble" onclick="openRedPacket(\'' + c.id + '\', ' + isSelf + ', ' + (rpData.opened ? 'true' : 'false') + ')" ' + ctxAttr + '>' +
+        '<div class="rp-header"><div class="rp-icon">￥</div><div>' + (isSelf ? '发出的红包' : '收到红包') + '</div></div>' +
+        '<div class="rp-text">' + escapeHtml(rpData.msg || '恭喜发财') + '</div>' +
+        '<div class="rp-footer">' + (rpData.opened ? '已拆开' : (isSelf ? '等待领取' : '点击拆开')) + '</div></div>';
+    } else {
+      bubbleContent = '<div class="bubble" ' + ctxAttr + '>' + escapeHtml(c.content) + '</div>';
+    }
+    html += '<div class="row ' + (isSelf ? 'self' : 'other') + '">' + av + '<div class="bubble-wrap"><div class="uname">' + escapeHtml(name) + '</div>' + bubbleContent + '</div></div>';
+  });
+  container.innerHTML = html;
+  container.scrollTop = container.scrollHeight;
+}
+
+async function sendChat() {
+  var input = document.getElementById('chatInput'); var content = input.value.trim(); if (!content) return;
+  var btn = document.getElementById('sendChatBtn'); btn.disabled = true;
+  try {
+    // ★ 调用安全 RPC，包含防刷屏秒封逻辑
+    var r = await window.sb.rpc('send_chat_message', { p_content: content });
+    if (r.error) throw r.error;
+    
+    // ★ 如果后端判定被封号
+    if (r.data.banned) {
+        input.value = '';
+        window.showBanOverlay(r.data.message);
+        return;
+    }
+    if (!r.data.success) throw new Error(r.data.message);
+    
+    input.value = ''; loadChats();
+  } catch (e) { 
+    window.showCustomToast('发送失败：' + e.message); 
+  } finally { 
+    btn.disabled = false; 
+  }
+}
+
+document.getElementById('chatRedPacketBtn').onclick = function() { document.getElementById('sendRpModal').classList.add('active'); };
+document.getElementById('sendRpBtn').onclick = async function() {
+  var amt = parseFloat(document.getElementById('rpAmount').value);
+  var msg = document.getElementById('rpMessage').value.trim() || '恭喜发财，大吉大利';
+  if (!amt || amt <= 0) return window.showCustomToast('请输入正确的金额');
+  if (amt > currentUser.coins) return window.showCustomToast('余额不足');
+  
+  this.disabled = true; this.textContent = '处理中...';
+  try {
+    var rpData = { amount: amt, msg: msg, opened: false, sender: currentUser.id };
+    var content = '[红包]' + JSON.stringify(rpData);
+    await window.sb.from('chats').insert([{ user_id: currentUser.id, author: currentUser.nickname, content: content }]);
+    
+    // 扣除发红包者余额
+    await window.sb.rpc('change_my_coins', { p_amount: -amt });
+    currentUser.coins -= amt; setSessionUser(currentUser);
+
+    document.getElementById('sendRpModal').classList.remove('active');
+    document.getElementById('rpAmount').value = ''; document.getElementById('rpMessage').value = '';
+    loadChats();
+  } catch (e) { window.showCustomToast('发红包失败：' + e.message); } finally { this.disabled = false; this.textContent = '塞钱进红包'; }
+};
+
+window.openRedPacket = async function(msgId, isSelf, isOpened) {
+  if (isSelf) return window.showCustomToast('不能拆自己发的红包哦');
+  if (isOpened) return window.showCustomToast('该红包已被拆开');
+  
+  try {
+    // ★ 调用安全 RPC 拆红包，防并发防篡改
+    var r = await window.sb.rpc('claim_red_packet', { p_msg_id: msgId });
+    if (r.error) throw r.error;
+    if (!r.data.ok) throw new Error(r.data.message);
+    
+    document.getElementById('rpOpenResult').textContent = r.data.amount;
+    document.getElementById('rpOpenMsg').textContent = '已存入余额';
+    document.getElementById('openRpModal').classList.add('active');
+    
+    currentUser.coins += r.data.amount; setSessionUser(currentUser);
+    loadChats();
+  } catch(e) { window.showCustomToast(e.message); }
+};
+
+var ctxCurrentMsgId = null; var ctxTargetMsg = null;
+window.showContextMenu = function(e, msgId, isSelf) {
+  e.preventDefault(); e.stopPropagation();
+  ctxCurrentMsgId = msgId; ctxTargetMsg = chats.find(function(x) { return x.id === msgId; });
+  var menu = document.getElementById('contextMenu');
+  var html = '';
+  var revokeSvg = '<svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>';
+  var reportSvg = '<svg viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>';
+
+  if (isSelf) html = '<button class="danger" onclick="handleCtxAction(\'revoke\')">' + revokeSvg + '撤回消息</button>';
+  else {
+    if (isAdmin) html = '<button class="danger" onclick="handleCtxAction(\'admin_revoke\')">' + revokeSvg + '撤回消息</button>';
+    html += '<button class="warning" onclick="handleCtxAction(\'report\')">' + reportSvg + '举报</button>';
+  }
+  menu.innerHTML = html;
+  var x = e.clientX; var y = e.clientY; var mw = 130; var mh = menu.children.length > 1 ? 88 : 44;
+  if (x + mw > window.innerWidth) x -= mw; if (y + mh > window.innerHeight) y -= mh;
+  menu.style.left = x + 'px'; menu.style.top = y + 'px'; menu.classList.add('show');
+};
+
+window.handleCtxAction = async function(action) {
+  document.getElementById('contextMenu').classList.remove('show');
+  if (!ctxCurrentMsgId || !ctxTargetMsg) return;
+  var name = ctxTargetMsg.users ? ctxTargetMsg.users.nickname : (ctxTargetMsg.author || '匿名');
+
+  if (action === 'revoke' || action === 'admin_revoke') {
+    if (!(await showCustomConfirm('撤回消息', '确定要撤回该条消息吗？'))) return;
+    try {
+      await window.sb.from('chats').delete().eq('id', ctxCurrentMsgId);
+      var sysContent = '[系统消息]' + name + '|' + (action === 'revoke' ? '撤回了一条消息' : '的消息被管理员撤回了');
+      await window.sb.from('chats').insert([{ user_id: currentUser.id, author: 'system', content: sysContent }]);
+      loadChats(); window.showCustomToast('已撤回');
+    } catch(err) { window.showCustomToast('撤回失败：' + err.message); }
+  } else if (action === 'report') { document.getElementById('reportModal').classList.add('active'); }
+};
+
+window.submitReport = async function() {
+  if (!ctxTargetMsg) return;
+  var type = document.getElementById('reportType').value; var remark = document.getElementById('reportRemark').value.trim();
+  var targetName = ctxTargetMsg.users ? ctxTargetMsg.users.nickname : (ctxTargetMsg.author || '匿名');
+  var contentSnapshot = (ctxTargetMsg.content || '').substring(0, 50) + (remark ? ' [备注: ' + remark + ']' : '');
+  this.disabled = true; this.textContent = '提交中...';
+  try {
+    await window.sb.from('reports').insert([{ reporter_id: currentUser.id, reporter_name: currentUser.nickname, target_user_id: ctxTargetMsg.user_id, target_name: targetName, type: type, content_snapshot: contentSnapshot, status: 'pending' }]);
+    document.getElementById('reportModal').classList.remove('active'); document.getElementById('reportRemark').value = '';
+    window.showCustomToast('举报已提交给管理员'); 
+  } catch (e) { window.showCustomToast('举报失败：' + e.message); } finally { this.disabled = false; this.textContent = '提交举报'; }
+};
+
+document.addEventListener('click', function(e) { var menu = document.getElementById('contextMenu'); if (menu && menu.classList.contains('show') && !menu.contains(e.target)) menu.classList.remove('show'); });
+document.getElementById('sendChatBtn').onclick = sendChat;
+document.getElementById('chatInput').onkeydown = function(e) { if (e.key === 'Enter') sendChat(); };
+
+(function init() {
+  var check = setInterval(function() {
+    if (window.sb) { 
+        clearInterval(check); 
+        loadChats(); 
+        window.sb.channel('public:chats').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chats' }, function() { loadChats(); }).subscribe(); 
+    }
+  }, 100);
+})();
+</script>
+</body>
+</html>

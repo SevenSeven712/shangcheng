@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8" />
+<link rel="manifest" href="./manifest.json" />
+<meta name="theme-color" content="#65A30D" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Seven戚 · 留言板</title>
+<link rel="stylesheet" href="./theme.css" />
+<script src="./vendor/supabase.js"></script>
+<style>
+.app-content{flex:1;min-height:0;display:flex;flex-direction:column}
+.msg-list{flex:1;overflow-y:auto;padding:20px 16px 8px;display:flex;flex-direction:column;gap:12px;-webkit-overflow-scrolling:touch}
+
+.msg{display:flex;gap:14px;padding:16px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-md);flex-shrink:0;box-shadow:var(--shadow-sm);transition:var(--transition-smooth)}
+.msg:hover{box-shadow:var(--shadow-md)}
+.msg .avatar{width:40px;height:40px;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:600;font-size:16px;color:var(--brand-dark);background:var(--brand-bg);background-size:cover;background-position:center}
+.msg .body{flex:1;min-width:0}
+.msg .meta{display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap}
+.msg .name{font-size:.95em;font-weight:600;color:var(--text)}
+.msg .official-tag{ background:#EFF6FF; color:#2563EB; font-size:.6em; padding:2px 8px; border-radius:var(--radius-pill); font-weight:600; border:1px solid #BFDBFE; }
+.msg .time{font-size:.75em;color:var(--text-light)}
+.msg .txt{font-size:.95em;line-height:1.6;color:var(--text);word-break:break-word}
+.msg .ip{margin-top:10px;font-size:.75em;color:var(--text-light);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.msg .ip .comment-btn{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:.9em;display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:var(--radius-pill);transition:var(--transition-smooth);}
+.msg .ip .comment-btn:hover{background:var(--bg);color:var(--brand)}
+.msg .ip .del-btn{background:none;border:none;color:var(--danger);cursor:pointer;font-size:.9em;opacity:0.7;padding:4px 10px;border-radius:var(--radius-pill);margin-left:auto;display:flex;align-items:center;gap:4px;transition:var(--transition-smooth);}
+.msg .ip .del-btn:hover{opacity:1;background:var(--danger-bg)}
+.empty-state{text-align:center;color:var(--text-muted);padding:40px 20px;font-size:.9em}
+.loading-state{text-align:center;color:var(--text-muted);padding:40px 20px;font-size:.9em}
+
+/* 输入区 */
+.fixed-input-area{flex-shrink:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:var(--bg-glass);backdrop-filter:blur(16px);border-top:1px solid var(--border);display:flex;gap:10px;align-items:center;flex-wrap:wrap;box-shadow:0 -4px 12px rgba(0,0,0,.02);}
+.fixed-input-area .input-wrapper{flex:1;display:flex;gap:10px;min-width:0}
+.fixed-input-area input{flex:1;padding:12px 16px;border-radius:var(--radius-pill);border:1px solid var(--border-subtle);background:var(--bg-surface);font-family:inherit;font-size:.9em;outline:none;color:var(--text);min-width:0;transition:var(--transition-smooth);}
+.fixed-input-area input:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-bg)}
+.fixed-input-area button{padding:12px 24px;border-radius:var(--radius-pill);border:none;background:var(--brand);color:#fff;font-weight:600;font-size:.9em;cursor:pointer;font-family:inherit;white-space:nowrap;transition:var(--transition-smooth);}
+.fixed-input-area button:active{transform:scale(.96)}
+
+/* 评论弹层 */
+.comment-overlay{position:fixed;inset:0;z-index:999;background:rgba(17,24,39,0.4);backdrop-filter:blur(4px);display:none;align-items:flex-end;justify-content:center;}
+.comment-overlay.active{display:flex;animation:fadeIn .2s ease;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.comment-panel{background:var(--bg-surface);border-radius:24px 24px 0 0;max-width:100%;width:100%;max-height:80vh;display:flex;flex-direction:column;animation:slideUp .3s cubic-bezier(0.4, 0, 0.2, 1);}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.comment-header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border);}
+.comment-close{background:none;border:none;font-size:1.2em;color:var(--text-muted);cursor:pointer;transition:var(--transition-smooth);}
+.comment-close:hover{color:var(--text)}
+.comment-list{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:12px;}
+.comment-item{padding:12px 14px;background:var(--bg);border-radius:var(--radius-sm);}
+.comment-item .c-meta{display:flex;justify-content:space-between;font-size:.8em;color:var(--text-muted);margin-bottom:6px;font-weight:600;}
+.comment-item .c-txt{font-size:.9em;line-height:1.5;color:var(--text);}
+.comment-input-area{display:flex;gap:10px;padding:12px 20px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--border);background:var(--bg-surface);}
+.comment-input-area input{flex:1;padding:12px 16px;border-radius:var(--radius-pill);border:1px solid var(--border-subtle);background:var(--bg);outline:none;transition:var(--transition-smooth);}
+.comment-input-area input:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-bg)}
+.comment-input-area button{padding:12px 24px;border-radius:var(--radius-pill);border:none;background:var(--brand);color:#fff;font-weight:600;cursor:pointer;transition:var(--transition-smooth);}
+.comment-input-area button:active{transform:scale(.96)}
+</style>
+<script>
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for (let registration of registrations) { registration.unregister(); }
+    });
+}
+if ('caches' in window) {
+    caches.keys().then(function(names) {
+        for (let name of names) { caches.delete(name); }
+    });
+}
+</script>
+</head>
+<body>
+<div id="mainApp">
+  <div id="header-container"></div>
+  <div class="app-content">
+    <div class="msg-list" id="messageList">
+      <div class="skeleton-card" style="padding:16px;margin-bottom:12px;">
+        <div class="skeleton-header"><div class="skeleton skeleton-avatar" style="width:40px;height:40px;"></div><div class="skeleton skeleton-title" style="width:30%;"></div></div>
+        <div class="skeleton skeleton-line" style="width:80%;margin-top:8px;"></div>
+      </div>
+      <div class="skeleton-card" style="padding:16px;">
+        <div class="skeleton-header"><div class="skeleton skeleton-avatar" style="width:40px;height:40px;"></div><div class="skeleton skeleton-title" style="width:30%;"></div></div>
+        <div class="skeleton skeleton-line" style="width:60%;margin-top:8px;"></div>
+      </div>
+    </div>
+    <div class="fixed-input-area" id="messageInputArea">
+      <div class="input-wrapper">
+        <input type="text" id="msgInput" placeholder="写下你的留言…" maxlength="200" />
+        <button id="sendMsgBtn">发送</button>
+      </div>
+    </div>
+  </div>
+  <div id="footer-container"></div>
+</div>
+
+<div class="comment-overlay" id="commentOverlay">
+  <div class="comment-panel">
+    <div class="comment-header">
+      <span style="font-weight:700;">评论</span>
+      <button class="comment-close" id="closeComment">✕</button>
+    </div>
+    <div class="comment-list" id="commentList"></div>
+    <div class="comment-input-area">
+      <input type="text" id="commentInput" placeholder="写评论…" maxlength="200" />
+      <button id="sendCommentBtn">发送</button>
+    </div>
+  </div>
+</div>
+
+<script src="./common.js"></script>
+<script>
+var currentUser = getSessionUser();
+var isAdmin = currentUser && currentUser.is_admin === true;
+
+// 渲染头部和底部
+renderHeader('留言板', 'messages');
+renderFooter('messages');
+
+var messages = [];
+var currentParentId = null;
+
+function safeUrl(u){if(!u)return '';var s=String(u).trim();if(!/^https?:\/\//.test(s))return '';if(/[()'"<>;]/.test(s))return '';return escapeHtml(s);}
+
+async function loadMessages() {
+    var list = document.getElementById('messageList');
+    list.innerHTML = '<div class="skeleton-card" style="padding:16px;margin-bottom:12px;"><div class="skeleton-header"><div class="skeleton skeleton-avatar" style="width:40px;height:40px;"></div><div class="skeleton skeleton-title" style="width:30%;"></div></div><div class="skeleton skeleton-line" style="width:80%;margin-top:8px;"></div></div>';
+    try {
+        var res = await window.sb.from('messages').select('*').order('created_at', { ascending: false });
+        if(res.error) throw res.error;
+        messages = res.data || [];
+        renderMessages();
+    } catch(e) { list.innerHTML = '<div class="empty-state">加载失败：' + escapeHtml(e.message) + '</div>'; }  
+}
+
+function renderMessages() {
+    var list = document.getElementById('messageList');
+    if(!messages.length) { list.innerHTML = '<div class="empty-state">暂无留言，快来抢沙发吧！</div>'; return; }
+    var html = '';
+    messages.filter(function(m) { return !m.parent_id; }).forEach(function(m) {
+        var isOfficial = m.is_official || m.name === 'Seven戚';
+        var timeStr = new Date(m.created_at).toLocaleString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        var canDelete = isAdmin || (currentUser && String(currentUser.id) === String(m.user_id));
+        var delBtn = canDelete ? '<button class="del-btn" data-id="'+m.id+'">删除</button>' : '';
+        html += '<div class="msg">';
+        html += '<div class="avatar" style="background:' + (m.color || 'var(--brand-bg)') + '">' + escapeHtml(String(m.name || 'U').charAt(0).toUpperCase()) + '</div>';
+        html += '<div class="body">';
+        html += '<div class="meta"><span class="name">' + escapeHtml(m.name) + '</span>' + (isOfficial ? '<span class="official-tag">官方</span>' : '') + '<span class="time">' + timeStr + '</span></div>';
+        html += '<div class="txt">' + escapeHtml(m.text) + '</div>';
+        html += '<div class="ip"><span>' + escapeHtml(m.ip || '未知') + '</span>';
+        html += '<button class="comment-btn" data-id="'+m.id+'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>评论</button>';
+        html += delBtn;
+        html += '</div></div></div>';
+    });
+    list.innerHTML = html;
+
+    list.querySelectorAll('.comment-btn').forEach(function(btn) { btn.onclick = function() { openComment(this.dataset.id); }; });
+    list.querySelectorAll('.del-btn').forEach(function(btn) {
+        btn.onclick = async function() {
+            if(!(await window.showCustomConfirm('删除留言', '确定要删除这条留言吗？'))) return;
+            try { await window.sb.from('messages').delete().eq('id', this.dataset.id); window.showCustomToast('已删除'); loadMessages(); } catch(e) { window.showCustomToast('删除失败'); }
+        };
+    });
+}
+
+document.getElementById('sendMsgBtn').onclick = async function() {
+    var input = document.getElementById('msgInput');
+    var text = input.value.trim();
+    if(!text) return window.showCustomToast('请输入内容');
+    if(!currentUser) { window.showCustomToast('请先登录后留言'); setTimeout(function(){ window.location.href='./index.html?login=1'; }, 1000); return; }
+    var btn = this; btn.disabled = true;
+    try {
+        // ★ 安全调用：防刷屏、强制真实 IP
+        var r = await window.sb.rpc('create_message', { p_text: text });
+        if (r.error) throw r.error;
+        if (!r.data.success) throw new Error(r.data.message);
+        input.value = ''; window.showCustomToast('留言成功'); loadMessages();
+    } catch(e) { window.showCustomToast('发送失败：' + e.message); } finally { btn.disabled = false; }
+};
+
+function openComment(parentId) {
+    currentParentId = parentId;
+    document.getElementById('commentOverlay').classList.add('active');
+    document.getElementById('commentInput').value = '';
+    renderComments();
+}
+document.getElementById('closeComment').onclick = function() { document.getElementById('commentOverlay').classList.remove('active'); };
+document.getElementById('commentOverlay').onclick = function(e) { if(e.target === this) this.classList.remove('active'); };
+
+async function renderComments() {
+    var box = document.getElementById('commentList');
+    box.innerHTML = '<div class="skeleton-card"><div class="skeleton-header"><div class="skeleton skeleton-avatar" style="width:40px;height:40px;"></div><div class="skeleton skeleton-title"></div></div><div class="skeleton skeleton-line" style="width:70%;margin-top:10px;"></div></div>';
+    try {
+        var res = await window.sb.from('messages').select('*').eq('parent_id', currentParentId).order('created_at');
+        var list = res.data || [];
+        if(!list.length) { box.innerHTML = '<div class="empty-state">还没有评论</div>'; return; }
+        box.innerHTML = list.map(function(c) {
+            var time = new Date(c.created_at).toLocaleString('zh-CN', {hour:'2-digit', minute:'2-digit'});
+            var delBtn = (isAdmin || String(currentUser.id) === String(c.user_id)) ? '<button onclick="deleteComment(\''+c.id+'\')" style="background:none;border:none;color:var(--danger);font-size:0.8em;cursor:pointer;margin-left:auto;">删除</button>' : '';
+            return '<div class="comment-item"><div class="c-meta" style="display:flex;align-items:center;gap:8px;"><b>'+escapeHtml(c.name)+'</b><span>'+time+'</span>'+delBtn+'</div><div class="c-txt">'+escapeHtml(c.text)+'</div></div>';
+        }).join('');
+        box.scrollTop = box.scrollHeight;
+    } catch(e) { box.innerHTML = '加载失败'; }
+}
+
+window.deleteComment = async function(id) {
+    if(!(await window.showCustomConfirm('删除评论', '确定删除此评论？'))) return;
+    try { await window.sb.from('messages').delete().eq('id', id); renderComments(); } catch(e) { window.showCustomToast('删除失败'); }
+};
+document.getElementById('sendCommentBtn').onclick = async function() {
+    var input = document.getElementById('commentInput');
+    var text = input.value.trim();
+    if(!text) return;
+    if(!currentUser) { window.showCustomToast('请先登录'); return; }
+    var btn = this; btn.disabled = true;
+    try {
+        await window.sb.from('messages').insert([{ user_id: currentUser.id, name: currentUser.nickname, text: text, parent_id: currentParentId }]);
+        input.value = ''; renderComments();
+    } catch(e) { window.showCustomToast('评论失败：' + e.message); } finally { btn.disabled = false; }
+};
+
+loadMessages();
+</script>
+</body>
+</html>
