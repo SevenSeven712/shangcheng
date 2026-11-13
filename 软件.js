@@ -113,7 +113,7 @@ const APPS = {
         rating: 4.9,
         version: "1.0.0",
         views: 12500,
-        website: "https://sevenseven712.github.io/liuyanban/",
+        website: "https://liuyanban.de5.net/",
         shortDesc: "Seven戚呕心沥血研究了后端编程后捣鼓出的 社区/频道 网站",
         description: "Seven戚频道是一个由Seven戚个人开发的聊天交流网站，同时也是他第一次将后端编程运用到自己的网站中运营。",
         notice: "",
