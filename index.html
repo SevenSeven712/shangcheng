@@ -2398,7 +2398,7 @@
                                     <div class="app-desc">${app.shortDesc}</div>
                                     ${updateDisplay ? `<div class="app-update-time"><i class="fa-solid fa-rotate"></i> <span class="update-date">${updateDisplay}</span></div>` : ''}
                                 </div>
-                                <button class="visit-btn online" onclick="event.stopPropagation();visitApp('${app.id}')">访问</button>
+                                <button class="visit-btn online" onclick="event.stopPropagation();visitApp('${app.id}')">${app.actionText || '访问'}</button>
                             </div>
                         `;
                 }).join('');
@@ -2447,7 +2447,7 @@
                                     ${updateDisplay ? `<div class="app-update-time"><i class="fa-solid fa-rotate"></i> <span class="update-date">${updateDisplay}</span></div>` : ''}
                                 </div>
                                 <button class="visit-btn ${statusClass}" onclick="event.stopPropagation();visitApp('${app.id}')">
-                                    ${app.status === 'online' ? '访问' : (app.status === 'beta' ? '内测' : '下架')}
+                                    ${app.actionText || (app.status === 'online' ? '访问' : (app.status === 'beta' ? '内测' : '下架'))}
                                 </button>
                             </div>
                         `;
@@ -2580,7 +2580,7 @@
                 const updateVisitBtn = (btn) => {
                     if (app.status === 'online' && app.website) {
                         btn.className = 'visit-btn online';
-                        btn.textContent = '访问';
+                        btn.textContent = app.actionText || '访问';
                         btn.onclick = function(e) { e.stopPropagation(); visitApp(app.id); };
                     } else {
                         btn.className = 'visit-btn error';
@@ -2640,7 +2640,7 @@
                                 ${updateDisplay ? `<div class="app-update-time"><i class="fa-solid fa-rotate"></i> <span class="update-date">${updateDisplay}</span></div>` : ''}
                             </div>
                             <button class="visit-btn ${statusClass}" onclick="event.stopPropagation();visitApp('${app.id}')">
-                                ${app.status === 'online' ? '访问' : (app.status === 'beta' ? '内测' : '下架')}
+                                ${app.actionText || (app.status === 'online' ? '访问' : (app.status === 'beta' ? '内测' : '下架'))}
                             </button>
                         </div>
                     `;
@@ -2777,7 +2777,7 @@
                                     ${updateDisplay ? `<div class="app-update-time"><i class="fa-solid fa-rotate"></i> <span class="update-date">${updateDisplay}</span></div>` : ''}
                                 </div>
                                 <button class="visit-btn ${statusClass}" onclick="event.stopPropagation();visitApp('${app.id}')">
-                                    ${app.status === 'online' ? '访问' : (app.status === 'beta' ? '内测' : '下架')}
+                                    ${app.actionText || (app.status === 'online' ? '访问' : (app.status === 'beta' ? '内测' : '下架'))}
                                 </button>
                             </div>
                         `;

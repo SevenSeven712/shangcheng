@@ -4,6 +4,36 @@
 
 // ---------- 应用数据 ----------
 const APPS = {
+    spxz: {
+        id: "spxz",
+        name: "视频解析下载（插件）",
+        icon: "📥",
+        iconUrl: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='30' fill='%232f8f80'/%3E%3Cpath d='M64 28v52M38 58l26 26 26-26M32 102h64' stroke='%23fff' stroke-width='12' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E",
+        developerId: "sevenqi",
+        developer: "Seven戚",
+        category: "tools",
+        categoryName: "工具",
+        status: "online",
+        statusText: "已上线",
+        rating: 5.0,
+        version: "1.0.0",
+        views: 8888,
+        website: "https://github.com/SevenSeven712/SPXZ/releases/download/v1.0.0/seven7nb.zip",
+        shortDesc: "支持 B站/抖音/快手的免费公益下载插件",
+        description: "在夸克浏览器里一键解析并下载 B站/抖音/快手 视频，自动启动本地 Python 后端。\n\n主要功能：\n· 支持最高 1080P/4K 画质下载\n· 自动接管网页登录态，无需繁琐配置\n· 带有极简悬浮窗和双模式后台\n· 完全本地运行，无需担心隐私泄露，纯免费公益！",
+        notice: "这是一个浏览器插件，下载后请仔细阅读压缩包内的《使用说明》进行安装。需要安装 Python 环境。",
+        updates: [
+            { version: "v1.0.0", date: "2026-11-21", tag: "大版本更新", content: "·插件正式公测发布\n·支持 B站、抖音、快手 视频一键解析下载\n·自动拉起本地 Python 后端\n·新增 GitHub 自动更新检测提示" }
+        ],
+        screenshots: [
+            "https://i.ibb.co/gFJJDd1y/QQ20260628-151756.png" // 暂时借用
+        ],
+        actionText: "下载",
+        collaborators: [
+            { id: "sevenqi", name: "Seven戚", role: "开发" },
+            { id: "deep", name: "Deepseek", role: "协助开发" }
+        ]
+    },
     video: {
         id: "video",
         name: "七七视频解析",
@@ -248,9 +278,8 @@ const APPS = {
         description: "七七三国杀是一个家庭向娱乐软件，适合和朋友用同一个设备玩。\n\n主要功能：\n? 同一设备交替游戏\n? 线下多人游戏",
         notice: "",
         updates: [
-            { version: "v1.1.0", date: "2026-11-15", tag: "项目恢复", content: "本项目正式恢复运营以及更新<br>新增联机模式并完全将本游戏的风格修改为白黑水墨画风格<br>联机模式具体玩法：<br>1.点击“开始游戏”或“房间”选择新建或加入房间，邀请你的好友来游玩就行啦！<br> tip：本网站后端有限，项目随时会停止联机支持" },
             { version: "v1.0.0", date: "2026-07-12", content: "游戏正式上线" },
-            { version: "v0.2.3", date: "2026-06-18", content: "- 修复武将已知问题" }
+            { version: "v0.2.3", date: "2026-06-18", content: "? 修复武将已知问题" }
         ],
         screenshots: [
             "https://i.ibb.co/hJZ4Kb92/image.png",
