@@ -18,7 +18,7 @@ const APPS = {
         rating: 5.0,
         version: "1.0.0",
         views: 8888,
-        website: "https://github.com/SevenSeven712/SPXZ/releases/download/v1.0.0/seven7nb.zip",
+        website: "https://github.com/SevenSeven712/SPXZ/releases/download/v1.0.0/seven.v1.0.0.zip",
         shortDesc: "支持 B站/抖音/快手的免费公益下载插件",
         description: "在夸克浏览器里一键解析并下载 B站/抖音/快手 视频，自动启动本地 Python 后端。\n\n主要功能：\n· 支持最高 1080P/4K 画质下载\n· 自动接管网页登录态，无需繁琐配置\n· 带有极简悬浮窗和双模式后台\n· 完全本地运行，无需担心隐私泄露，纯免费公益！",
         notice: "这是一个浏览器插件，下载后请仔细阅读压缩包内的《使用说明》进行安装。需要安装 Python 环境。",
